@@ -1,0 +1,16 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Shubh Vivah//Wedding Invitation//EN
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:royal-rajput-wedding-20261209@prateek-prachi-vivah.github.io
+DTSTAMP:20261122T000000Z
+DTSTART;VALUE=DATE:20261209
+DTEND;VALUE=DATE:20261210
+SUMMARY:प्रतीक और प्राची | शुभ विव
+ ाह
+LOCATION:द पटेल लैंडमार्क गार्डन\,
+  कुरवाई\, जिला विदिशा\, मध्य प्
+ रदेश 464224
+END:VEVENT
+END:VCALENDAR
