@@ -1,0 +1,281 @@
+:root {
+  --ink: #31252a;
+  --wine: #692a3b;
+  --gold: #86582c;
+  --paper: #fff5df;
+  --border: #d5b477;
+  --temple-blue: #191b2b;
+  --antique-gold: #dbb778;
+  --gilt: #ffdfa4;
+  background: #f4e6cb;
+}
+body { background: #f4e6cb; }
+body, #top { margin: 0; }
+[hidden] { display: none !important; }
+.darshan-closed { overflow: hidden; background: #151624; }
+.darshan-closed main, .darshan-closed footer { display: none; }
+.darshan-cover {
+  min-height: 100svh;
+  display: grid;
+  justify-items: center;
+  background: radial-gradient(ellipse at 50% 35%, #654837 0%, #272337 45%, #111422 92%);
+  color: #fff1d1;
+  overflow: hidden;
+}
+.darshan-stage {
+  height: 100svh;
+  width: min(100%, 70svh);
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: #352321;
+  box-shadow: 0 0 90px #07080ee0, 0 0 0 1px #c99a5e66;
+}
+.darshan-art, .darshan-scene, .opening-doors, .darshan-vignette, .darshan-art video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.darshan-scene {
+  background: var(--art) center center / cover;
+  opacity: 0;
+  transition: opacity .7s ease;
+}
+.darshan-scene.show { opacity: 1; }
+.darshan-playing .darshan-scene.show { animation: approach 4.9s ease-out both; }
+.darshan-art video { object-fit: cover; opacity: 0; }
+.film-playing video { opacity: 1; transition: opacity .28s ease; }
+.darshan-vignette {
+  background: linear-gradient(180deg,#10111e85,transparent 18%,transparent 53%,#120e1ea6 75%,#15101bee 91%,#15101b 100%);
+}
+.darshan-frame {
+  position: absolute;
+  inset: max(.65rem,env(safe-area-inset-top)) .65rem max(.65rem,env(safe-area-inset-bottom));
+  border: 1px solid #f3ce8c7a;
+  outline: 1px solid #e6bc7352;
+  outline-offset: -5px;
+  pointer-events: none;
+}
+.opening-doors {
+  display: none;
+  overflow: hidden;
+}
+.darshan-playing[data-scene="0"] .opening-doors { display: flex; }
+.opening-doors i {
+  flex: 1 1 50%;
+  background: url('/vaikuntha/gate.webp') center / auto max(100svh, 105vw) no-repeat;
+  transform-origin: left center;
+  animation: doors-left 3.4s ease-in-out both;
+}
+.opening-doors i:first-child { background-position: right center; background-size: auto 100%; }
+.opening-doors i:last-child {
+  background-position: left center;
+  background-size: auto 100%;
+  transform-origin: right center;
+  animation-name: doors-right;
+}
+@keyframes approach { from { transform: scale(1); } to { transform: scale(1.08); } }
+@keyframes doors-left { 0%, 24% { transform: translateX(0); } 100% { transform: translateX(-101%); } }
+@keyframes doors-right { 0%, 24% { transform: translateX(0); } 100% { transform: translateX(101%); } }
+.darshan-caption {
+  position: absolute;
+  inset: auto 1.5rem max(7.05rem,calc(6.8rem + env(safe-area-inset-bottom)));
+  text-align: center;
+}
+.darshan-caption p {
+  color: #fff1d1;
+  font: 500 clamp(2rem,7vw,4rem)/1.12 var(--serif);
+  letter-spacing: -.03em;
+  text-shadow: 0 3px 15px #110e16;
+  text-wrap: balance;
+  animation: caption-in .58s ease-out both;
+}
+html[lang="hi"] .darshan-caption p { letter-spacing: 0; line-height: 1.3; }
+@keyframes caption-in { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+.darshan-actions {
+  position: absolute;
+  inset: auto 1.2rem max(1.65rem,calc(1.5rem + env(safe-area-inset-bottom)));
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: .4rem .65rem;
+}
+.darshan-actions .skip, #cover-hint {
+  position: static;
+  transform: none;
+  color: #fff0d4;
+  border: 1px solid #ebbc719c;
+  box-shadow: none;
+  background: #211928d9;
+  font: 650 .85rem/1.2 var(--sans);
+  border-radius: 2px;
+  padding: .72rem .85rem;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+#cover-hint { background: #f7d596; color: #311d22; }
+.darshan-actions .skip:hover { background: #3c2937; }
+.darshan-progress {
+  position: absolute; height: 2px; bottom: .7rem; left: .7rem; right: .7rem;
+  background: #f1c9803d;
+}
+.darshan-progress::after {
+  content: ""; position: absolute; inset: 0 auto 0 0;
+  width: var(--progress,0%); background: #ffcf87; transition: width .5s ease;
+}
+.invite-tools { z-index: 15; }
+.invite-tools a, .invite-tools button {
+  background: #251c2aec;
+  color: #fff0ce;
+  border: 1px solid #ba945d;
+  border-radius: 3px;
+}
+.invite-tools a:hover, .invite-tools button:hover { background: #623041; color: #fff0ce; }
+.welcome.scene {
+  min-height: min(840px,100svh);
+  padding: clamp(3.9rem,9vw,7rem) clamp(1rem,4vw,4rem) clamp(2.25rem,6vw,5rem);
+  display: grid;
+  grid-template-columns: minmax(0,29rem) minmax(0,34rem);
+  align-content: center;
+  align-items: stretch;
+  gap: clamp(.85rem,2vw,1.5rem);
+  background: radial-gradient(ellipse at 50% 15%,#433148,#1a2035 70%);
+  border-bottom: 3px double var(--antique-gold);
+}
+.welcome .welcome-art {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  border: 1px solid #d8ae6b;
+  border-radius: 48% 48% 2px 2px / 13% 13% 2px 2px;
+  overflow: hidden;
+  box-shadow: 0 10px 40px #100f2066;
+}
+.welcome .welcome-art img { display: block; width: 100%; height: 100%; object-fit: cover; aspect-ratio: 4 / 5; }
+.welcome .welcome-card {
+  position: relative;
+  margin: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border: 4px double #af8249;
+  outline: 1px solid #af8249;
+  outline-offset: -11px;
+  border-radius: 3px;
+  padding: clamp(1.65rem,4vw,3.7rem) clamp(1.4rem,4vw,3rem);
+  background: #fff3d6 url('/vaikuntha/paper.webp') center / 100% 100%;
+  box-shadow: 0 10px 40px #110f1f8c;
+}
+.welcome-card::before, .welcome-card::after { display: none; }
+.welcome .seal { color: #853348; font-size: clamp(1.9rem,4vw,2.8rem); margin-bottom: .15rem; }
+.welcome .invocation, .welcome .narayana-invocation { color: #7b3441; font-weight: 650; line-height: 1.4; }
+.welcome .ganesh-verse { margin: .55rem 0 .95rem; line-height: 1.65; color: #553029; }
+.welcome-card .eyebrow { margin-top: .2rem; color: #673742; }
+.welcome h1, html[lang="hi"] .welcome h1 { color: #61273d; font-size: clamp(2.85rem,6vw,4.35rem); margin: .45rem 0 .65rem; }
+.welcome h1 i { color: #87552a; }
+.welcome-card .invitation-line { margin: 0 auto; color: #50343c; }
+.primary-date {
+  display: grid;
+  gap: .16rem;
+  margin: 1.0rem 0 .4rem;
+  color: #5b2638;
+  font: 700 clamp(1.05rem,2.4vw,1.28rem)/1.4 var(--serif);
+}
+.primary-date span { font: 600 .94rem/1.45 var(--sans); }
+.wedding-range { color: #664332; }
+.welcome-card .invitation-links { margin-top: 1.1rem; }
+.welcome-card .invitation-links .jump, .calendar-actions .jump {
+  border-color: #a0693b;
+  border-radius: 2px;
+  background: #fff2d5;
+  color: #572437;
+}
+.date-section {
+  background: linear-gradient(120deg,#f6e7cd,#f8edda 55%,#f0dfc3);
+  color: #553443;
+}
+.scroll .date-paper { background: #fff2d8 url('/vaikuntha/paper.webp') center / 100% 100%; }
+.scroll .paper-frame { border-color: #b88751; }
+.schedule {
+  background: radial-gradient(ellipse at 50% 4%,#423449,#222337 67%,#1c2033);
+  color: #fff0d3;
+  border-block: 3px double #bd965d;
+}
+.schedule > :is(h2, .eyebrow, .swipe-hint, .current-event) { color: #fff0d3; }
+.schedule .schedule-view, .schedule .carousel-nav > button {
+  background: #302539; color: #fff0d3; border-color: #c4a06c; border-radius: 2px;
+}
+.schedule .schedule-view[aria-pressed="true"] { background: #f8d69e; color: #392131; }
+.schedule .event-card { background: #fff2dc; border: 1px solid #c9a36a; border-radius: 3px; }
+.schedule .event-body { background: #fff3df; color: #422c36; }
+.schedule .event-body .eyebrow { color: #673441; }
+.venues { background: #f7ead1; }
+.venues .venue-card { border: 1px solid #c8a572; background: #fff4df; border-radius: 3px; }
+.map-controls .button { background: #623044; color: #fff0d7; border: 1px solid #784d47; border-radius: 2px; }
+.map-controls .button.secondary { color: #5c2a39; background: #fff2d8; }
+footer {
+  background: radial-gradient(ellipse at 50% 5%,#3c2b44,#1b2034 69%);
+  color: #f9e7c8;
+  border-top: 3px double #ba955f;
+}
+footer :is(.seal,.eyebrow,.closing,.jump,a) { color: #fff0d3; }
+@media (max-width: 650px) {
+  .darshan-stage { width: 100%; }
+  .welcome.scene { grid-template-columns: minmax(0, 30rem); gap: .95rem; padding-top: 4.1rem; }
+  .welcome .welcome-art { order: 1; max-height: 21rem; }
+  .welcome .welcome-art img { aspect-ratio: 6 / 5; object-position: center 55%; }
+}
+@media (max-height: 490px) and (orientation: landscape) {
+  .darshan-stage { width: min(100%, 112svh); }
+  .darshan-caption { bottom: 4rem; }
+  .darshan-caption p { font-size: 1.65rem; }
+  .darshan-actions { bottom: .85rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .darshan-caption p, .darshan-scene, .darshan-progress::after { animation: none; transition: none; }
+}
+.invite-tools {
+  position: absolute;
+  inset: max(.84rem,env(safe-area-inset-top)) max(.9rem,env(safe-area-inset-right)) auto auto;
+  border: 0;
+  padding: 0;
+  background: transparent;
+}
+@media (max-aspect-ratio: 2 / 3) {
+  .darshan-scene {
+    background-image: var(--art), linear-gradient(#392b35,#594334 45%,#292034);
+    background-size: 100% auto, cover;
+    background-repeat: no-repeat;
+    background-position: center 42%, center;
+  }
+  .darshan-art video { object-fit: contain; object-position: center 42%; }
+  .darshan-vignette {
+    background: linear-gradient(#181524 0%,#18152400 17%,#18152400 65%,#1b14218c 78%,#15101b 97%);
+  }
+}
+.darshan-playing[data-scene="0"]:not(.film-playing) .darshan-scene:nth-child(2) { opacity: 1; }
+.opening-doors i {
+  background-position: left center; background-size: 200% auto;
+}
+.opening-doors i:first-child { background-position: left center; background-size: 200% auto; }
+.opening-doors i:last-child { background-position: right center; background-size: 200% auto; }
+@media (max-aspect-ratio: 2 / 3) {
+  .opening-doors i:first-child { background-position: left 42%; }
+  .opening-doors i:last-child { background-position: right 42%; }
+}
+.welcome::before {
+  background: linear-gradient(#151927ac,#191d2cdb), url('/vaikuntha/pavilion.webp') center 54% / cover;
+  opacity: .65;
+}
+.date-section::before {
+  background: url('/vaikuntha/mandap.webp') center 62% / cover;
+  opacity: .09;
+}
+.darshan-scene:not(.show) { background-image: none; }
+.darshan-playing[data-scene="0"]:not(.film-playing) .darshan-scene:nth-child(2) { background-image: var(--art); }
