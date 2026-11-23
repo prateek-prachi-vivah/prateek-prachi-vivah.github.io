@@ -414,3 +414,194 @@ footer :is(.seal,.eyebrow,.closing,.jump,a) { color: var(--light); }
 @media (max-width: 650px) {
   .film-periphery { --frame-photo: url('./ganesh-mobile.webp'); }
 }
+
+/* Keep navigation in document flow so it cannot obscure the schedule or venue content. */
+.invite-tools {
+  position: sticky;
+  top: 0;
+  inset-inline: 0;
+  justify-content: flex-end;
+  min-height: 3.55rem;
+  margin: 0;
+  padding: max(.38rem,env(safe-area-inset-top)) max(.7rem,env(safe-area-inset-right)) .38rem max(.7rem,env(safe-area-inset-left));
+  background: #201722;
+}
+.intro-open .invite-tools { background: linear-gradient(#211722,#211722e8); }
+.invite-tools a, .invite-tools button { padding-inline: .84rem; }
+.card-visible .welcome.scene {
+  min-height: calc(100svh - 3.55rem);
+  min-height: calc(100dvh - 3.55rem);
+  padding-top: clamp(1rem,3.5vw,2.7rem);
+}
+#save-the-date, #schedule, #venues { scroll-margin-top: 5.35rem; }
+.film-poster, .film-shot:not([data-gate]) > img {
+  object-fit: contain;
+  object-position: center;
+  animation: sacred-appear .38s ease-out both;
+}
+.film-periphery, .film-shot::before {
+  filter: saturate(.77) brightness(.55);
+  background-image: linear-gradient(#231c2cd9,#543423d9 48%,#231c2cf0), var(--frame-photo, url('./ganesh.webp'));
+}
+.film-shot { animation: scene-join .27s ease-out both; }
+@keyframes scene-join { from { opacity: .12; } to { opacity: 1; } }
+@keyframes sacred-appear { from { opacity: .8; } to { opacity: 1; } }
+
+.portal {
+  position: absolute;
+  top: 49%;
+  left: 50%;
+  width: min(96vw, 110rem);
+  max-height: 84svh;
+  aspect-ratio: var(--portal-ratio);
+  transform: translate(-50%,-50%);
+  animation: pass-portal 1.2s cubic-bezier(.28,.44,.15,1) both;
+}
+.film-shot[data-gate="entry"] .portal, .film-shot[data-gate="1"] .portal { width: min(86vw,54svh); }
+@keyframes pass-portal {
+  0% { transform: translate(-50%,-50%) scale(.98); }
+  100% { transform: translate(-50%,-50%) scale(1.065); }
+}
+.portal .portal-architecture {
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  animation: none;
+}
+.portal-aperture {
+  position: absolute;
+  left: var(--portal-left);
+  top: var(--portal-top);
+  width: var(--portal-width);
+  height: var(--portal-height);
+  overflow: hidden;
+  border-radius: 25% 25% 2% 2% / 17% 17% 3% 3%;
+  background: #2b1a24;
+  isolation: isolate;
+}
+.portal-aperture::after {
+  position: absolute;
+  content: '';
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  box-shadow: inset 0 .18rem .9rem #1e1120ad;
+}
+.portal .portal-interior {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 49%;
+  animation: inner-light .9s ease both;
+}
+@keyframes inner-light { from { opacity: .57; } to { opacity: 1; } }
+.portal-doors {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  perspective: max(230px,38vw);
+  perspective-origin: 50% 50%;
+  transform-style: preserve-3d;
+}
+.portal-leaf {
+  position: relative;
+  width: 50%;
+  height: 100%;
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+  background-image: linear-gradient(90deg,#19101d26,transparent 18%,transparent 83%,#34192166), var(--door-texture);
+  background-size: 100% 100%, var(--texture-size);
+  background-repeat: no-repeat;
+  animation: swing-in .91s cubic-bezier(.53,.02,.21,1) both;
+}
+.portal-leaf.left {
+  --leaf-angle: 85deg;
+  transform-origin: left center;
+  background-position: center, var(--texture-left) var(--texture-y);
+}
+.portal-leaf.right {
+  --leaf-angle: -85deg;
+  transform-origin: right center;
+  background-position: center, var(--texture-right) var(--texture-y);
+}
+.portal-leaf::after {
+  content: '';
+  position: absolute;
+  inset: 0 0 0 auto;
+  width: 4%;
+  background: linear-gradient(90deg,#7c522c,#2d1925);
+  transform-origin: right;
+  transform: rotateY(68deg);
+}
+.portal-leaf.right::after { inset: 0 auto 0 0; transform-origin: left; transform: rotateY(-68deg); }
+.film-shot[data-gate="7"] .portal-leaf { animation-duration: 1.15s; }
+@keyframes swing-in {
+  0%, 13% { transform: rotateY(0deg); }
+  100% { transform: rotateY(var(--leaf-angle)); }
+}
+
+.book-mark {
+  display: grid;
+  grid-auto-flow: column;
+  align-items: center;
+  gap: .25rem;
+  margin-bottom: .7rem;
+  color: #f7d499;
+  font: 600 clamp(1.85rem,7vw,3.95rem)/1 Georgia,serif;
+  letter-spacing: -.08em;
+  text-shadow: 0 1px 0 #a97739, 0 3px 0 #774822, 0 5px 13px #1f111ae8;
+}
+.book-mark small { font-size: .46em; }
+.welcome.scene.book-opening .book-jacket { animation-duration: 1.48s; }
+.welcome.scene.book-opening .book-reveal { animation-duration: 1.48s; }
+.welcome-veil { background: radial-gradient(ellipse at 53% 42%,#281b292e,#271929bd 99%); }
+
+.schedule .event-card .event-art { width: 100%; height: auto; aspect-ratio: 3 / 2; object-fit: contain; background: #352830; }
+.venues .venue-card {
+  position: relative;
+  border-radius: 1.05rem;
+  box-shadow: 0 24px 48px #653c2f24, 0 5px 0 #c39b674d;
+}
+.venues .venue-photo-frame {
+  margin: .52rem .52rem 0;
+  border-radius: .7rem;
+  box-shadow: 0 14px 22px #2b19133a;
+  isolation: isolate;
+}
+.venues .venue-photo-frame::before {
+  position: absolute;
+  content: '';
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(ellipse at 30% 20%,#805843,#33232f);
+}
+.venues .venue-photo-frame .venue-gate-photo { object-position: center; transform: none; transition: transform .63s ease; }
+.venues .venue-card .venue-photo-caption { inset: auto .55rem .55rem; margin: 0; }
+.venues .venue-card .venue-meta { padding-top: 1.45rem; }
+.venues .venue-card .map-controls { align-items: center; }
+@media (hover:hover) and (prefers-reduced-motion:no-preference) {
+  .venues .venue-card:hover .venue-gate-photo { transform: scale(1.032) translateY(-.3%); }
+}
+@media (orientation: landscape) and (max-height: 530px) {
+  .portal { width: min(83vw,125vh); }
+  .film-poster, .film-shot:not([data-gate]) > img { object-fit: contain; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .film-shot, .film-poster, .film-shot:not([data-gate]) > img, .portal, .portal .portal-interior, .portal-leaf { animation: none; }
+  .venues .venue-photo-frame .venue-gate-photo { transition: none; }
+}
+/* The narrow portrait art remains intact while the outer wash fills wider screens. */
+.film-shot:not([data-gate]) > img, .film-poster { inset: 3.5rem 0 3.8rem; height: calc(100% - 7.3rem); }
+@media (min-width: 750px) and (min-height: 720px) {
+  .film-shot:not([data-gate]) > img, .film-poster { inset-block: 1rem 0; height: calc(100% - 1rem); }
+}
+@media (orientation: landscape) and (max-height: 530px) {
+  .film-shot:not([data-gate]) > img, .film-poster { inset: 0; height: 100%; }
+}
+.venue-photo-frame img { image-rendering: auto; }
+#scene-caption { font-size: clamp(1.55rem,6.1vw,3.45rem); }
+/* Cropping the side walls on portrait screens keeps the door itself comfortably large. */
+@media (max-width: 650px) and (orientation: portrait) {
+  .film-shot[data-gate]:not([data-gate="1"]) .portal { width: min(155vw, 75svh); }
+}
+.film:has(.film-shot) .film-poster { visibility: hidden; }

@@ -131,7 +131,7 @@ for (const [index, event] of wedding.events.entries()) {
   card.style.setProperty('--accent', event.accent);
   card.id = 'celebration-' + (index + 1);
   const art = create('img', 'event-art');
-  art.src = '/darshan/ritual-' + (index + 1) + '.webp';
+  art.src = '/darshan/ceremony-' + (index + 1) + '.webp';
   art.alt = isHindi ? event.title + ' का चित्रण' : 'Illustration for ' + event.title;
   art.width = 768;
   art.height = 512;
@@ -337,12 +337,15 @@ if ('IntersectionObserver' in window && !motion.matches) {
     for (const entry of entries) {
       if (!entry.isIntersecting) continue;
       reveal.unobserve(entry.target);
-      entry.target.animate([{ opacity: .78 }, { opacity: 1 }], {
-        duration: 360, easing: 'ease-out',
-      });
+      const photoCard = entry.target.matches('.venue-card');
+      const frames = photoCard
+        ? [{ opacity: .64, transform: 'perspective(900px) rotateX(8deg) translateY(15px)' },
+           { opacity: 1, transform: 'perspective(900px) rotateX(0deg) translateY(0)' }]
+        : [{ opacity: .78 }, { opacity: 1 }];
+      entry.target.animate(frames, { duration: photoCard ? 660 : 360, easing: 'cubic-bezier(.2,.65,.25,1)' });
     }
   }, { threshold: .14 });
-  for (const section of document.querySelectorAll('.date-section, .schedule, .venues')) {
+  for (const section of document.querySelectorAll('.date-section, .schedule, .venue-card')) {
     reveal.observe(section);
   }
 }
