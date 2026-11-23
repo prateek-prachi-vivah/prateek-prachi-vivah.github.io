@@ -118,7 +118,7 @@ function openCover({ animate = true, focus = true } = {}) {
   if (animate && !motion.matches) {
     opening = true;
     root.classList.add('cover-opening');
-    setTimeout(finish, 850);
+    setTimeout(finish, 640);
   } else {
     finish();
   }
