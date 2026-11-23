@@ -131,7 +131,7 @@ for (const [index, event] of wedding.events.entries()) {
   card.style.setProperty('--accent', event.accent);
   card.id = 'celebration-' + (index + 1);
   const art = create('img', 'event-art');
-  art.src = '/shubh-vivah/photos/function-' + (index + 1) + '.webp';
+  art.src = '/darshan/ritual-' + (index + 1) + '.webp';
   art.alt = isHindi ? event.title + ' का चित्रण' : 'Illustration for ' + event.title;
   art.width = 768;
   art.height = 512;
@@ -272,7 +272,8 @@ for (const venue of wedding.venues) {
   map.target = '_blank';
   map.rel = 'noopener noreferrer';
   map.setAttribute('aria-label', text.mapPin(venue.name));
-  card.append(create('p', 'eyebrow', venue.occasion), create('h3', '', venue.name), create('p', '', venue.address));
+  const details = create('div', 'venue-meta');
+  details.append(create('p', 'eyebrow', venue.occasion), create('h3', '', venue.name), create('p', '', venue.address));
   const controls = create('div', 'map-controls');
   const getDirections = create('a', 'button', isHindi ? 'Google Maps से रास्ता' : 'Google Maps directions');
   getDirections.href = mapsLink('dir', { destination: venue.coordinates });
@@ -308,6 +309,9 @@ for (const venue of wedding.venues) {
   photo.alt = isKurwai
     ? (isHindi ? 'पटेल लैंडमार्क का मुख्य द्वार' : 'The Patel Landmark main entrance')
     : (isHindi ? 'रॉयल सेलिब्रेशन्स क्लब की इमारत और लॉन' : 'Royal Celebrations Club building and lawn');
+  photo.srcset = '/darshan/' + (isKurwai ? 'kurwai' : 'bhopal') + '-venue-mobile.webp 650w, ' +
+    photo.src + (isKurwai ? ' 1440w' : ' 1280w');
+  photo.sizes = '(max-width: 720px) 95vw, 540px';
   photo.loading = 'lazy';
   photo.decoding = 'async';
   photo.width = isKurwai ? 1440 : 1280;
@@ -324,8 +328,7 @@ for (const venue of wedding.venues) {
     caption.append(credit);
   }
   figure.append(photo, caption);
-  card.append(figure);
-  card.append(controls);
+  card.append(figure, details, controls);
   venueCards.append(card);
 }
 

@@ -1,194 +1,177 @@
 const preferenceKey = 'wedding-audio-v2';
+const levels = { opening: 1.65, card: 2.75 };
 
-/** One gain bus owns the opening cues and the original card bhajan. */
+/** Reuse the original credited Ganesh bhajan across both scenes and the card. */
 export function weddingAudio({ source, control, hindi, isCardOpen }) {
   const labels = hindi ? {
-    play: 'गणेश भजन सुनें', pause: 'भजन रोकें', on: 'ध्वनि चालू करें',
-    off: 'ध्वनि बंद करें', loading: 'भजन लोड हो रहा है', retry: 'भजन फिर चलाएँ'
+    on: 'भक्ति संगीत सुनें', off: 'ध्वनि बंद करें',
+    play: 'गणेश भजन सुनें', pause: 'भजन रोकें', loading: 'संगीत लोड हो रहा है'
   } : {
-    play: 'Play Ganesh bhajan', pause: 'Pause bhajan', on: 'Enable sound',
-    off: 'Mute sound', loading: 'Loading bhajan', retry: 'Retry bhajan'
+    on: 'Play devotional music', off: 'Mute sound',
+    play: 'Play Ganesh bhajan', pause: 'Pause bhajan', loading: 'Loading music'
   };
-  let choice = '';
-  try { choice = sessionStorage.getItem(preferenceKey) || ''; } catch {}
-  let context, bus, bufferPromise, track, trackGain, startedAt;
+  let choice;
+  try { choice = sessionStorage.getItem(preferenceKey); } catch {}
+  let context, mix, decoded, track, gain, startedAt, roomFade;
   let offset = 0;
-  let pending = 0;
-  let status = 'idle';
-  let visible = !document.hidden;
-  let blocked = false;
+  let sequence = 0;
+  let pending = false;
+  let nativePending = false;
+  let wantsSound = choice === 'on';
   let lastCue = -Infinity;
 
   function display() {
-    const openingSound = !isCardOpen() && choice === 'on' && context?.state === 'running';
-    const playing = Boolean(openingSound || track || !source.paused);
-    control.textContent = status === 'loading' ? labels.loading
-      : playing ? (isCardOpen() ? labels.pause : labels.off)
-      : blocked ? labels.retry : (isCardOpen() ? labels.play : labels.on);
-    control.setAttribute('aria-pressed', String(playing));
-    control.dataset.status = status;
+    const sound = Boolean(track || !source.paused);
+    control.dataset.status = sound ? 'playing' : pending || nativePending ? 'loading' : 'paused';
+    control.setAttribute('aria-pressed', String(sound));
+    control.textContent = sound ? (isCardOpen() ? labels.pause : labels.off)
+      : pending || nativePending ? labels.loading : (isCardOpen() ? labels.play : labels.on);
   }
 
-  function setChoice(value) {
-    choice = value;
-    try { sessionStorage.setItem(preferenceKey, value); } catch {}
-    if (value !== 'on') stop();
+  function level() {
+    const next = isCardOpen() ? levels.card : levels.opening;
+    if (track) gain.gain.setTargetAtTime(next, context.currentTime, .24);
+    else {
+      clearInterval(roomFade);
+      const desired = isCardOpen() ? 1 : .78;
+      if (source.paused) {
+        source.volume = desired;
+        return;
+      }
+      roomFade = setInterval(() => {
+        source.volume += (desired - source.volume) * .17;
+        if (Math.abs(desired - source.volume) < .015) {
+          source.volume = desired;
+          clearInterval(roomFade);
+        }
+      }, 50);
+    }
+  }
+
+  function stop() {
+    sequence++;
+    pending = nativePending = false;
+    clearInterval(roomFade);
+    if (track) {
+      const now = context.currentTime;
+      const node = track;
+      const nodeGain = gain;
+      offset = (offset + now - startedAt) % node.buffer.duration;
+      nodeGain.gain.cancelScheduledValues(now);
+      nodeGain.gain.setTargetAtTime(0, now, .018);
+      node.stop(now + .075);
+      node.onended = () => { node.disconnect(); nodeGain.disconnect(); };
+      track = undefined;
+    }
+    if (!source.paused) offset = source.currentTime;
+    source.pause();
     display();
   }
 
-  function getContext() {
-    if (!context) {
-      const Audio = window.AudioContext || window.webkitAudioContext;
-      if (!Audio) return;
-      context = new Audio();
-      bus = context.createGain();
-      bus.gain.value = .86;
-      bus.connect(context.destination);
-    }
-    return context;
+  function remember(value) {
+    choice = value;
+    wantsSound = value === 'on';
+    try { sessionStorage.setItem(preferenceKey, value); } catch {}
   }
 
-  function load() {
-    bufferPromise ??= fetch(source.src)
+  function decode() {
+    decoded ??= fetch(source.src)
       .then(response => {
         if (!response.ok) throw new Error('Bhajan unavailable');
         return response.arrayBuffer();
       })
       .then(bytes => context.decodeAudioData(bytes))
-      .catch(error => { bufferPromise = undefined; throw error; });
-    return bufferPromise;
+      .catch(error => { decoded = undefined; throw error; });
+    return decoded;
   }
 
-  async function unlock() {
-    try {
-      const audio = getContext();
-      if (!audio) return false;
-      const resume = audio.resume();
-      load().catch(() => {});
-      await resume;
-      display();
-      return audio.state === 'running';
-    } catch { return false; }
-  }
-
-  async function play() {
-    if (choice !== 'on' || !visible || !isCardOpen() || track || !source.paused || status === 'loading') return;
-    const request = ++pending;
-    status = 'loading';
-    blocked = false;
+  function playNative() {
+    if (document.hidden || choice === 'off' || track || nativePending || pending || !source.paused) return;
+    const id = ++sequence;
+    nativePending = true;
+    source.volume = isCardOpen() ? 1 : .78;
     display();
-    try {
-      if (!context || context.state !== 'running') throw new Error('Audio permission needed');
-      const buffer = await load();
-      if (request !== pending || choice !== 'on' || !visible || !isCardOpen()) return;
-      track = context.createBufferSource();
-      track.buffer = buffer;
-      track.loop = true;
-      trackGain = context.createGain();
-      startedAt = context.currentTime;
-      trackGain.gain.setValueAtTime(0, startedAt);
-      trackGain.gain.linearRampToValueAtTime(3.20, startedAt + .48);
-      track.connect(trackGain).connect(bus);
-      track.start(startedAt, offset % buffer.duration);
-      status = 'playing';
-    } catch {
-      if (request !== pending) return;
-      blocked = true;
-      status = 'paused';
-    }
-    display();
-  }
-
-  function silenceCue() {
-    if (!context || !bus) return;
-    const now = context.currentTime;
-    bus.gain.cancelScheduledValues(now);
-    bus.gain.setTargetAtTime(.0001, now, .015);
-  }
-
-  function restoreBus() {
-    if (!context || !bus) return;
-    const now = context.currentTime;
-    bus.gain.cancelScheduledValues(now);
-    bus.gain.setTargetAtTime(.86, now, .035);
-  }
-
-  function stop() {
-    pending++;
-    silenceCue();
-    if (track) {
-      const now = context.currentTime;
-      offset = (offset + now - startedAt) % track.buffer.duration;
-      trackGain.gain.cancelScheduledValues(now);
-      trackGain.gain.setTargetAtTime(0, now, .018);
-      track.stop(now + .08);
-      track = undefined;
-    }
-    source.pause();
-    blocked = false;
-    status = 'paused';
-    display();
-  }
-
-  function cue(kind) {
-    if (choice !== 'on' || !visible || context?.state !== 'running') return;
-    const now = context.currentTime;
-    if (now - lastCue < .6) return;
-    lastCue = now;
-    restoreBus();
-    const door = kind === 'door';
-    const cueLevel = door ? .07 : kind === 'cord' ? .033 : .05;
-    for (const [index, multiple] of [1, 2.01, 2.76, 4.08].entries()) {
-      const note = context.createOscillator();
-      const gain = context.createGain();
-      const tail = .62 - .12 * index;
-      note.type = 'sine';
-      note.frequency.value = (door ? 392 : 523.25) * multiple;
-      gain.gain.setValueAtTime(.0001, now);
-      gain.gain.exponentialRampToValueAtTime(cueLevel / (1 + index), now + .012);
-      gain.gain.exponentialRampToValueAtTime(.0001, now + tail);
-      note.connect(gain).connect(bus);
-      note.start(now);
-      note.stop(now + tail);
-      note.onended = () => { note.disconnect(); gain.disconnect(); };
-    }
+    source.play().then(() => {
+      if (choice === 'off' || document.hidden) source.pause();
+      else if (id === sequence) wantsSound = true;
+    }).catch(() => {}).finally(() => {
+      if (id === sequence) { nativePending = false; display(); }
+    });
   }
 
   function activate() {
-    setChoice('on');
-    const unlocked = unlock();
-    if (isCardOpen()) {
-      restoreBus();
-      // A direct media play in the button event also works when Web Audio is unavailable.
+    remember('on');
+    if (track || pending || document.hidden) return;
+    try {
+      const Audio = window.AudioContext || window.webkitAudioContext;
+      if (!Audio) { playNative(); return; }
       if (!context) {
-        source.play().catch(() => { blocked = true; display(); });
-        return;
+        context = new Audio();
+        mix = context.createGain();
+        mix.connect(context.destination);
       }
-      unlocked.then(ready => { if (ready) play(); else { blocked = true; display(); } });
-    } else unlocked.then(ready => { if (ready && isCardOpen()) { restoreBus(); play(); } });
+      if (!source.paused || nativePending) stop();
+      const id = ++sequence;
+      pending = true;
+      display();
+      Promise.all([context.resume(), decode()]).then(([, buffer]) => {
+        if (id !== sequence || choice === 'off' || document.hidden) return;
+        track = context.createBufferSource();
+        track.buffer = buffer;
+        track.loop = true;
+        gain = context.createGain();
+        startedAt = context.currentTime;
+        gain.gain.value = .001;
+        track.connect(gain).connect(mix);
+        track.start(startedAt, offset % buffer.duration);
+        level();
+      }).catch(() => {
+        if (id !== sequence) return;
+        pending = false;
+        playNative();
+      }).finally(() => {
+        if (id === sequence) { pending = false; display(); }
+      });
+    } catch { playNative(); }
+  }
+
+  function cue(kind) {
+    if (choice === 'off' || !wantsSound || document.hidden || context?.state !== 'running') return;
+    const now = context.currentTime;
+    if (now - lastCue < .51) return;
+    lastCue = now;
+    const fundamental = { door: 440, sanctum: 587.33, darshan: 523.25, cord: 659.25 }[kind];
+    for (const [i, ratio] of [1, 2.02, 2.73, 4.04].entries()) {
+      const voice = context.createOscillator();
+      const decay = context.createGain();
+      const length = (kind === 'sanctum' ? .9 : .47) - .08 * i;
+      voice.frequency.value = fundamental * ratio;
+      decay.gain.setValueAtTime(.0001, now);
+      decay.gain.exponentialRampToValueAtTime(.053 / (1 + i), now + .021);
+      decay.gain.exponentialRampToValueAtTime(.0001, now + length);
+      voice.connect(decay).connect(mix);
+      voice.start(now);
+      voice.stop(now + length);
+      voice.onended = () => { voice.disconnect(); decay.disconnect(); };
+    }
   }
 
   control.addEventListener('click', () => {
-    if (choice === 'on' && (track || !source.paused || status === 'loading' || (!isCardOpen() && !blocked))) setChoice('off');
+    if (track || !source.paused || pending) { remember('off'); stop(); }
     else activate();
   });
-  for (const event of ['play', 'pause', 'ended', 'error']) source.addEventListener(event, display);
+  for (const event of ['play', 'pause', 'error']) source.addEventListener(event, display);
   document.addEventListener('visibilitychange', () => {
-    visible = !document.hidden;
-    if (!visible) stop();
-    else if (choice === 'on' && isCardOpen() && context?.state === 'running') { restoreBus(); play(); }
+    if (document.hidden) stop();
+    else if (wantsSound && choice !== 'off') {
+      if (context?.state === 'running') activate();
+      else playNative();
+    }
   });
   display();
-
   return {
-    activate,
-    mute: () => setChoice('off'),
-    startCard() {
-      restoreBus();
-      if (choice === 'on' && context?.state === 'running') play();
-      display();
-    },
-    stop,
+    prepare() { level(); playNative(); },
+    startCard() { level(); if (wantsSound && !track) playNative(); display(); },
     cue
   };
 }

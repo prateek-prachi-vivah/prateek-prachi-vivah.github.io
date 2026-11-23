@@ -76,13 +76,7 @@ html:not(.intro-open) .intro { display: none; }
   text-wrap: balance;
   margin: 0 0 .55rem;
 }
-#intro-actions {
-  width: min(100%, 32rem);
-  display: grid;
-  grid-template-columns: minmax(0,1fr) minmax(0,1fr);
-  gap: .56rem;
-}
-#intro-actions button, .intro-skip, .invite-tools a, .invite-tools button {
+.intro-skip, .invite-tools a, .invite-tools button {
   min-height: 44px;
   min-width: 44px;
   display: inline-grid;
@@ -94,11 +88,7 @@ html:not(.intro-open) .intro { display: none; }
   font-weight: 650;
   text-decoration: none;
 }
-#cover-hint { border: 1px solid #f6d69b; background: #f6d69b; color: #311e25; }
-#open-silent { border: 1px solid #dfb679af; background: #281b27d9; color: var(--light); }
-.intro-skip { color: var(--light); background: #201622b8; border: 1px solid #fff1d22e; }
-#cover-hint:hover { background: #ffe5b9; }
-#open-silent:hover, .intro-skip:hover { background: #462938; }
+.intro-skip:hover { background: #462938; }
 .intro-skip:focus:not(:focus-visible) { outline: 0; }
 .invite-tools {
   position: fixed;
@@ -250,3 +240,177 @@ footer :is(.seal,.eyebrow,.closing,.jump,a) { color: var(--light); }
 .intro-open:has(main :target) { overflow: auto; }
 .intro-open:has(main :target) .intro { display: none; }
 .intro-open:has(main :target) main, .intro-open:has(main :target) footer { display: block; }
+
+/* The artwork fills the physical viewport while the browser's own bars remain usable. */
+.film-poster { animation: first-darshan 2.6s cubic-bezier(.2,.5,.28,1) both; }
+.film-periphery, .film-shot::before {
+  position: absolute;
+  inset: -1.6rem;
+  background: var(--frame-photo, url('./ganesh.webp')) center 45% / cover;
+  filter: blur(22px) brightness(.6);
+}
+.film-shot::before { content: ''; }
+.film-shot { animation: none; }
+.film-shot > img { animation: shot-in 1.16s cubic-bezier(.16,.55,.22,1) both; }
+.film-shot[data-gate] > img { animation-duration: .87s; }
+.film-shot[data-gate="7"] > img { animation-duration: 1.17s; }
+.gate-opening span { animation-duration: .75s; }
+.film-shot[data-gate="7"] .gate-opening span { animation-duration: 1.04s; }
+@keyframes first-darshan { from { transform: scale(1.015); } to { transform: scale(1.08); } }
+@keyframes shot-in { from { transform: scale(1.025); } to { transform: scale(1.10); } }
+.intro-content { bottom: max(1.15rem,calc(env(safe-area-inset-bottom) + .6rem)); }
+.intro-skip { color: #fff4dc; background: #2c1d28dc; border: 0; }
+.intro-open #sound-toggle { background: #f7d59d; color: #37222e; border-color: #f7d59d; }
+.intro-open #sound-toggle[aria-pressed="true"] { background: #2b1c29ee; color: #fff1d4; border-color: #ba9663; }
+
+.welcome.scene {
+  grid-template-columns: minmax(0,1fr);
+  grid-template-rows: auto;
+  position: relative;
+  isolation: isolate;
+  min-height: 100svh;
+  min-height: 100dvh;
+  overflow: hidden;
+  justify-items: center;
+  align-items: center;
+  padding: max(4.2rem,calc(env(safe-area-inset-top) + 3.35rem)) clamp(1rem,5vw,5rem) max(1.75rem,env(safe-area-inset-bottom));
+  background: #211725;
+}
+.welcome.scene .welcome-art, .welcome-veil {
+  grid-area: auto;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  inset: 0;
+  max-width: none;
+  max-height: none;
+  z-index: -2;
+  order: 0;
+}
+.welcome.scene .welcome-art img {
+  width: 100%;
+  height: 100%;
+  max-height: none;
+  aspect-ratio: auto;
+  object-position: center 54%;
+}
+.welcome-veil { z-index: -1; background: radial-gradient(ellipse at 50% 38%,#26162726,#211523ba 96%); }
+.book-reveal {
+  width: min(100%,42rem);
+  grid-area: 1 / 1;
+  position: relative;
+  perspective: 1450px;
+  transform-style: preserve-3d;
+}
+.book-jacket {
+  display: none;
+  pointer-events: none;
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  border-radius: .35rem 1.1rem 1.1rem .35rem;
+  background: #4c2632 url('./royal-cover.webp') center / 100% 100%;
+  color: #f6d498;
+  box-shadow: 13px 15px 35px #200a17b3, inset 10px 0 15px #1d0f1d77;
+  transform-origin: left center;
+  backface-visibility: hidden;
+  place-content: center;
+  justify-items: center;
+  padding: 1rem;
+  text-align: center;
+}
+.book-jacket p { font: 600 clamp(1rem,3vw,1.5rem)/1.4 var(--serif); }
+.book-jacket strong { font: 500 clamp(2.15rem,6.8vw,4rem)/1.25 var(--serif); color: #fbe2b1; }
+.welcome.scene.book-opening .book-jacket { display: grid; animation: turn-jacket 1.18s cubic-bezier(.23,.6,.17,1) both; }
+.welcome.scene.book-opening .book-reveal { animation: arrive-book 1.16s cubic-bezier(.2,.65,.21,1) both; }
+@keyframes turn-jacket {
+  0%, 16% { transform: rotateY(0); opacity: 1; }
+  78% { opacity: 1; }
+  100% { transform: rotateY(-157deg); opacity: 0; }
+}
+@keyframes arrive-book {
+  from { transform: translateY(18px) scale(.94); }
+  to { transform: translateY(0) scale(1); }
+}
+.welcome .welcome-card {
+  width: 100%;
+  max-width: none;
+  padding: clamp(1.2rem,4.4vw,3.45rem) clamp(.9rem,4.5vw,3rem);
+  background: #fff4dc url('/vaikuntha/paper.webp') center / 100% 100%;
+  border-radius: .38rem 1.1rem 1.1rem .38rem;
+  box-shadow: 0 30px 75px #1a1026a3, inset 8px 0 17px #754d3021;
+}
+.welcome .seal { color: #734031; }
+.welcome .invocation, .welcome .narayana-invocation { color: #714132; }
+.welcome .welcome-card .invitation-links .jump { border-radius: 999px; }
+.welcome .ganesh-verse { font-size: clamp(.8rem,2.9vw,1rem); }
+
+.schedule { background: radial-gradient(ellipse at 50% 8%,#553544,#292033 64%,#201827); }
+.schedule .event-card {
+  border: 0;
+  border-radius: .9rem;
+  overflow: hidden;
+  box-shadow: 0 18px 35px #180f2240;
+}
+.event-art { aspect-ratio: 3 / 2; object-fit: cover; }
+.schedule .event-body { background: linear-gradient(135deg,#fff5df,#f8ebd3); }
+.carousel-nav .dot { border-radius: .45rem; }
+.carousel-nav .dots { scrollbar-width: none; }
+
+.venues {
+  background: linear-gradient(180deg,#f9e9cc,#f5e6d0 66%,#f5e8d2);
+}
+.venues .venue-card {
+  display: grid;
+  gap: 0;
+  text-align: start;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  border-radius: 1.1rem;
+  background: #fff6e3;
+  box-shadow: 0 15px 40px #59362324;
+}
+.venue-photo-frame { position: relative; overflow: hidden; margin: 0; border: 0; border-radius: 0; background: #473340; }
+.venues .venue-photo-frame .venue-gate-photo {
+  display: block;
+  inline-size: 100%;
+  block-size: auto;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  object-position: center 52%;
+  border-radius: 0;
+  transition: transform .55s ease;
+}
+.venue-card:hover .venue-gate-photo { transform: scale(1.035); }
+.venue-card .venue-photo-caption {
+  position: absolute;
+  inset: auto .65rem .65rem;
+  border: 0;
+  border-radius: .6rem;
+  padding: .5rem .7rem;
+  background: #251a27e0;
+  color: #fff0d3;
+}
+.venue-card .venue-meta, .venue-card .map-controls { padding-inline: clamp(.9rem,3.5vw,1.6rem); }
+.venue-meta { padding-top: 1.25rem; }
+.venue-meta h3 { margin: .31rem 0 .55rem; }
+.venue-card .map-controls { padding-bottom: 1.3rem; }
+.venue-card .map-controls :is(a,button) { min-height: 44px; }
+.venue-card .map-controls .button { border-radius: 999px; }
+
+@media (min-width: 720px) and (min-aspect-ratio: 4 / 5) {
+  .film-shot[data-gate] > img { object-fit: cover; }
+  .gate-opening span { background-size: cover; }
+}
+@media (max-width: 450px) {
+  .welcome.scene { padding-inline: .75rem; }
+  .welcome .welcome-card { padding-inline: 1rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .film-poster, .film-shot > img, .welcome.scene.book-opening :is(.book-jacket,.book-reveal) { animation: none; }
+  .welcome.scene.book-opening .book-jacket { display: none; }
+}
+@media (max-width: 650px) {
+  .film-periphery { --frame-photo: url('./ganesh-mobile.webp'); }
+}

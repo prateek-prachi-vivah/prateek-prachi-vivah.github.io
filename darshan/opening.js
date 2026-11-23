@@ -1,25 +1,20 @@
-import { weddingAudio } from './audio.js?v=1';
+import { weddingAudio } from './audio.js?v=2';
 
 const root = document.documentElement;
 const intro = document.querySelector('#top');
 const stage = document.querySelector('#film-scene');
 const caption = document.querySelector('#scene-caption');
-const actions = document.querySelector('#intro-actions');
-const enter = document.querySelector('#cover-hint');
-const silent = document.querySelector('#open-silent');
 const skip = document.querySelector('#skip-intro');
 const main = document.querySelector('main');
 const footer = document.querySelector('footer');
 const welcome = document.querySelector('#welcome');
 const target = document.querySelector('#welcome-names');
 const motion = matchMedia('(prefers-reduced-motion: reduce)');
-const frames = [...document.querySelectorAll('#scene-list li')];
-const durations = [1800, 2450, 1600, 3100, 2000];
-const prefetched = new Map();
-let revision = 0;
-let currentDelay;
-let completeTimer;
-let started = false;
+const sceneList = document.querySelector('#scene-list');
+const scenes = Object.fromEntries([...sceneList.children].map(element => [element.dataset.art, element]));
+const cache = new Map();
+let run = 0;
+let hardStop;
 let opened = !root.classList.contains('intro-open');
 
 const audio = weddingAudio({
@@ -28,132 +23,137 @@ const audio = weddingAudio({
   hindi: root.lang === 'hi',
   isCardOpen: () => opened
 });
+clearTimeout(window.invitationFallback);
 
-function img(index) {
-  if (!prefetched.has(index) && frames[index]) {
-    const art = new Image(1024, 1536);
-    art.alt = '';
-    art.decoding = 'async';
-    art.src = new URL(frames[index].dataset.art + '.webp', import.meta.url).href;
-    const loaded = art.decode().then(() => art, () => null);
-    prefetched.set(index, loaded);
+function artUrl(name) {
+  const smallScene = name === 'entry' || name === 'hall' || name === 'vishnu' || name === 'mandap';
+  const asset = smallScene && matchMedia('(max-width: 650px)').matches ? name + '-mobile' : name;
+  return new URL(asset + '.webp', import.meta.url).href;
+}
+
+function load(name) {
+  if (!cache.has(name)) {
+    const img = new Image();
+    img.alt = '';
+    img.decoding = 'async';
+    img.src = artUrl(name);
+    cache.set(name, img.decode().then(() => img, () => null));
   }
-  return prefetched.get(index);
+  return cache.get(name);
 }
 
-function stopTimers() {
-  revision++;
-  clearTimeout(completeTimer);
-  currentDelay?.cancel();
+const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+function getArt(name, deadline = 320) {
+  return Promise.race([load(name), wait(deadline).then(() => null)]);
 }
 
-function delay(ms) {
-  return new Promise(resolve => {
-    const timer = setTimeout(() => resolve(true), ms);
-    currentDelay = { cancel() { clearTimeout(timer); resolve(false); } };
-  });
-}
-
-function reveal({ focus = true } = {}) {
+function reveal({ cinematic = false, focus = false } = {}) {
   if (opened) return;
-  stopTimers();
+  run++;
+  clearTimeout(hardStop);
   opened = true;
   root.classList.remove('intro-open');
   intro.hidden = true;
   main.inert = footer.inert = false;
-  if (focus) {
-    window.scrollTo({ top: 0, behavior: 'instant' });
-    target.focus({ preventScroll: true });
-    if (!motion.matches) welcome.animate([{ opacity: .80 }, { opacity: 1 }], { duration: 475, easing: 'ease-out' });
+  if (cinematic && !motion.matches) {
+    welcome.classList.remove('book-opening');
+    requestAnimationFrame(() => {
+      if (opened) welcome.classList.add('book-opening');
+    });
   }
+  if (focus || window.scrollY > 0) window.scrollTo({ top: 0, behavior: 'instant' });
+  if (focus) target.focus({ preventScroll: true });
   audio.startCard();
 }
 
-function show(index, art, inside) {
+function setFrame(name, image, { inside, gate } = {}) {
   const layer = document.createElement('div');
   layer.className = 'film-shot';
-  layer.dataset.shot = frames[index].dataset.art;
-  if (inside) {
-    layer.classList.add('gates-open');
-    const entrance = document.createElement('div');
-    entrance.className = 'gate-opening';
-    const left = document.createElement('span');
-    const right = document.createElement('span');
-    entrance.style.setProperty('--gate', 'url("' + art.src + '")');
-    entrance.append(left, right);
-    layer.append(inside, entrance);
+  layer.dataset.shot = name;
+  layer.style.setProperty('--frame-photo', 'url("' + image.src + '")');
+  if (gate) {
+    layer.dataset.gate = String(gate);
+    const aperture = document.createElement('div');
+    aperture.className = 'gate-opening';
+    aperture.style.setProperty('--gate', 'url("' + image.src + '")');
+    aperture.append(document.createElement('span'), document.createElement('span'));
+    layer.append(inside, aperture);
+    caption.textContent = sceneList.dataset.gateLabel + ' ' + gate + ' / 7';
+    intro.setAttribute('aria-label', caption.textContent);
+    audio.cue(gate === 7 ? 'sanctum' : 'door');
   } else {
-    layer.append(art);
+    layer.append(image);
+    caption.textContent = scenes[name].textContent;
+    intro.setAttribute('aria-label', scenes[name].dataset.description);
   }
   stage.replaceChildren(layer);
-  caption.textContent = frames[index].textContent;
-  intro.setAttribute('aria-label', frames[index].dataset.description);
-  if (inside) audio.cue('door');
 }
 
-async function start() {
-  if (started || opened) return;
-  if (motion.matches) {
-    reveal();
-    return;
-  }
-  started = true;
-  const token = ++revision;
-  actions.hidden = true;
-  skip.focus({ preventScroll: true });
-  intro.classList.add('is-playing');
-  completeTimer = setTimeout(() => reveal(), 15000);
-  img(1);
-  img(2);
-  if (!await delay(durations[0]) || token !== revision) return;
-  for (let index = 1; index < frames.length; index++) {
-    // A slow or unavailable painting cannot trap guests on the opening.
-    const art = await Promise.race([img(index), delay(1700).then(() => null)]);
-    if (token !== revision) return;
-    img(index + 1);
-    if (!art) continue;
-    const inside = index === 1 ? await Promise.race([img(2), delay(800).then(() => null)]) : null;
-    if (token !== revision) return;
-    show(index, art, inside);
-    if (!await delay(durations[index]) || token !== revision) return;
-  }
-  reveal();
-}
-
-function showLanding() {
-  stopTimers();
+async function play() {
+  const token = ++run;
   opened = false;
-  started = false;
   main.inert = footer.inert = true;
   intro.hidden = false;
-  intro.classList.remove('is-playing');
   root.classList.add('intro-open');
-  caption.textContent = frames[0].textContent;
-  intro.setAttribute('aria-label', frames[0].dataset.description);
+  intro.classList.add('is-playing');
   stage.replaceChildren();
-  actions.hidden = false;
-  window.scrollTo({ top: 0, behavior: 'instant' });
+  caption.textContent = scenes.ganesh.textContent;
+  intro.setAttribute('aria-label', scenes.ganesh.dataset.description);
+  audio.prepare();
+  hardStop = setTimeout(() => reveal({ cinematic: true }), 14500);
+  load('entry');
+  load('hall');
+  load('vishnu');
+  // The poster is already visible. Downloads enhance later frames and cannot delay the first one.
+  for (let number = 2; number <= 7; number++) load('door-' + number);
+  await wait(1550);
+  if (token !== run) return;
+  for (let number = 1; number <= 7; number++) {
+    const name = number === 1 ? 'entry' : 'door-' + number;
+    const [preferred, hall, fallback] = await Promise.all([getArt(name), getArt('hall'), getArt('entry')]);
+    if (token !== run) return;
+    const image = preferred || fallback;
+    const behind = hall || image;
+    if (image && behind) {
+      setFrame(name, image.cloneNode(), { inside: behind.cloneNode(), gate: number });
+    } else {
+      caption.textContent = sceneList.dataset.gateLabel + ' ' + number + ' / 7';
+      audio.cue(number === 7 ? 'sanctum' : 'door');
+    }
+    await wait(number === 7 ? 1080 : 760);
+    if (token !== run) return;
+  }
+
+  for (const [name, duration] of [['vishnu', 2350], ['mandap', 1050]]) {
+    const image = await getArt(name, 500);
+    if (token !== run) return;
+    if (!image) continue;
+    setFrame(name, image.cloneNode());
+    if (name === 'vishnu') audio.cue('darshan');
+    await wait(duration);
+    if (token !== run) return;
+  }
+  reveal({ cinematic: true, focus: document.activeElement === skip });
 }
 
-enter.addEventListener('click', () => { audio.activate(); start(); });
-silent.addEventListener('click', () => { audio.mute(); start(); });
 skip.addEventListener('click', event => {
   event.preventDefault();
-  reveal();
+  reveal({ focus: true });
 });
 document.querySelector('#replay-invitation').addEventListener('click', event => {
   event.preventDefault();
   if (motion.matches) return;
   history.replaceState(null, '', location.pathname + location.search);
-  audio.stop();
-  showLanding();
-  start();
+  window.scrollTo({ top: 0, behavior: 'instant' });
+  play();
+  skip.focus({ preventScroll: true });
 });
 document.addEventListener('invitation-date-revealed', () => audio.cue('cord'));
 window.addEventListener('hashchange', () => {
   const section = document.getElementById(location.hash.slice(1));
   if (section && section !== intro && !opened) {
-    reveal({ focus: false });
+    reveal();
     section.scrollIntoView();
   }
 });
@@ -164,4 +164,6 @@ motion.addEventListener('change', event => {
 if (opened) {
   intro.hidden = true;
   if (location.hash) requestAnimationFrame(() => document.getElementById(location.hash.slice(1))?.scrollIntoView());
-} else showLanding();
+} else {
+  play();
+}
