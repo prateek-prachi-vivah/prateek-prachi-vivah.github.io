@@ -580,27 +580,57 @@ footer { background: #4d1427; }
   background: #e3b979;
   box-shadow: 0 .8rem 1.7rem #672b3026;
 }
-.opening-arch::after {
-  content: "";
+.opening-arch { perspective: 70rem; }
+.cover-invocation {
+  color: #784524;
+  margin: .65rem 0;
+  font-size: clamp(.95rem, 3vw, 1.35rem);
+}
+.invitation-leaf {
   position: absolute;
   inset: .35rem;
   border-radius: inherit;
-  background:
-    repeating-linear-gradient(45deg, transparent 0 17px, #d8a454 17px 18px),
-    repeating-linear-gradient(-45deg, transparent 0 17px, #d8a454 17px 18px);
-  opacity: 0;
+  transform-origin: top center;
+  transform-style: preserve-3d;
   pointer-events: none;
+}
+.leaf-front, .leaf-back {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 3px double #e4b476;
+  backface-visibility: hidden;
+}
+.leaf-front {
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: clamp(.15rem, 1.25vw, .65rem);
+  background: radial-gradient(ellipse at 50% 40%, #8a4050, #501628 75%);
+  color: #ffe2a8;
+  box-shadow: inset 0 0 0 .34rem #641f34, inset 0 0 0 .4rem #e2ae6d;
+}
+.leaf-front strong { font-size: clamp(.92rem, 3vw, 1.5rem); }
+.leaf-seal {
+  display: grid;
+  place-items: center;
+  width: 1.8em;
+  aspect-ratio: 1;
+  border: 3px double #e0ab63;
+  border-radius: 50%;
+  font: 400 clamp(1.8rem, 5vw, 3.4rem)/1 serif;
+}
+.leaf-ornament { font-size: clamp(.75rem, 2vw, 1.2rem); }
+.leaf-back {
+  transform: rotateX(180deg);
+  background: repeating-linear-gradient(45deg,#f6e2ba 0 10px,#eed4a5 10px 11px);
 }
 .opening-button { background: #681e33; border-color: #a96c42; color: #fff3d4; }
 .opening-button:focus-visible { outline-color: #681e33; }
-.cover-opening .cover { animation: invitation-paper-reveal .64s ease-in-out both; }
-.cover-opening .opening-arch::after { animation: invitation-lattice .52s ease-out both; }
-@keyframes invitation-lattice {
-  0% { opacity: 0; }
-  30% { opacity: .61; }
-  100% { opacity: 0; }
-}
-@keyframes invitation-paper-reveal { 55% { opacity: 1; } to { opacity: 0; } }
+.cover-opening .cover { animation: invitation-paper-reveal .98s ease-in-out both; }
+.cover-opening .invitation-leaf { animation: unfold-invitation .82s cubic-bezier(.2,.64,.21,1) both; }
+@keyframes unfold-invitation { to { transform: rotateX(110deg); } }
+@keyframes invitation-paper-reveal { 72% { opacity: 1; } to { opacity: 0; } }
 .welcome-art figcaption {
   position: absolute;
   inset: 27% 16% auto;
@@ -618,5 +648,5 @@ footer { background: #4d1427; }
 .welcome-art figcaption time { font-size: clamp(.73rem, 2.2vw, 1rem); }
 .haveli-ornament { color: #986b38; font-size: 1.15rem; }
 @media (prefers-reduced-motion: reduce) {
-  .cover-opening .cover, .cover-opening .opening-arch::after { animation: none; }
+  .cover-opening .cover, .cover-opening .invitation-leaf { animation: none; }
 }
