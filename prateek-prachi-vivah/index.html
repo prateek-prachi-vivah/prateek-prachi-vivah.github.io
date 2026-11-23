@@ -24,22 +24,24 @@
 <meta name="twitter:image" content="https://prateek-prachi-vivah.github.io/prateek-prachi-vivah/haveli-cover-share-hi.jpg">
 <link rel="canonical" href="https://prateek-prachi-vivah.github.io/prateek-prachi-vivah/">
 <link rel="alternate" hreflang="en" href="https://prateek-prachi-vivah.github.io/prateek-prachi-vivah/english/">
-<link rel="preload" as="image" href="/rajputana/palace.webp">
+
 <link rel="stylesheet" href="/styles.css">
 <link rel="stylesheet" href="/rajputana/theme.css">
-<link rel="stylesheet" href="/shubh-vivah/theme.css?v=27">
-<script type="module" src="/shubh-vivah/invite.js?v=27"></script>
+<link rel="stylesheet" href="/shubh-vivah/theme.css?v=28">
+<script type="module" src="/shubh-vivah/invite.js?v=28"></script>
 </head>
 <body>
 <nav class="invite-tools" aria-label="निमंत्रण की भाषा">
   <a href="/prateek-prachi-vivah/english/" lang="en" hreflang="en">English</a>
   <button type="button" id="sound-toggle" aria-pressed="false">गणेश भजन सुनें</button>
 </nav>
-<audio id="wedding-music" src="/shubh-vivah/ganesh-bhajan-soft.mp3" preload="auto" loop></audio>
+<audio id="wedding-music" src="/shubh-vivah/ganesh-bhajan-soft.mp3" preload="none" loop></audio>
 <a class="skip" href="#welcome">सीधे निमंत्रण पर जाएँ</a>
 <header class="cover scene" id="top">
-  <video class="cover-film" id="cover-film" muted playsinline preload="none" aria-hidden="true"></video>
   <div class="cover-content">
+    <figure class="opening-arch" aria-hidden="true">
+      <img src="/shubh-vivah/photos/haveli-entrance.webp" alt="" width="768" height="512" fetchpriority="high" decoding="async">
+    </figure>
     <div class="cover-copy">
       <p class="cover-kicker">शादी का निमंत्रण</p>
       <h2><span class="groom-name">प्रतीक</span> <i>और</i> <span class="bride-name">प्राची</span></h2>
@@ -47,35 +49,13 @@
       <time datetime="2026-12-09">बुधवार, 9 दिसंबर 2026</time>
       <p class="cover-place">द पटेल लैंडमार्क गार्डन · कुरवाई</p>
     </div>
-    <div class="cover-actions">
-      <button type="button" class="book" id="open-book" aria-label="विवाह पत्रिका खोलें" aria-controls="welcome">
-        <span class="book-page" aria-hidden="true"></span>
-        <span class="book-inside" aria-hidden="true">
-          <span class="seal devanagari" lang="hi">ॐ</span>
-          <span>परिवारों के आशीर्वाद से</span>
-          <span class="inside-couple"><span class="groom-name">प्रतीक</span> <i>और</i> <span class="bride-name">प्राची</span></span>
-        </span>
-        <span class="book-flap" aria-hidden="true">
-        <span class="book-front">
-          <span class="book-frame"><span></span><span></span><span></span><span></span></span>
-          <span class="seal devanagari" lang="hi">ॐ</span>
-          <span class="book-title">शुभ विवाह</span>
-          <span class="book-couple"><span class="groom-name">प्रतीक</span> <i>और</i> <span class="bride-name">प्राची</span></span>
-          <span class="gold-rule">✦</span>
-          <span class="book-date">शाही राजपूत विवाह</span>
-        </span>
-        <span class="book-back"><span aria-hidden="true">✦</span></span>
-        </span>
-      </button>
-      <button type="button" class="cover-hint" id="cover-hint" aria-controls="welcome"><span aria-hidden="true">✦</span> निमंत्रण खोलें</button>
-    </div>
+    <button type="button" class="opening-button" id="cover-hint" aria-controls="welcome">निमंत्रण खोलें</button>
   </div>
-  <div class="petals" id="cover-petals" aria-hidden="true"></div>
 </header>
 <main>
   <section class="welcome scene" id="welcome" aria-labelledby="welcome-names">
     <figure class="welcome-art">
-      <img src="/rajputana/palace.webp" alt="" width="768" height="512" decoding="async">
+      <img src="/rajputana/palace.webp" alt="" width="768" height="512" loading="lazy" decoding="async">
     </figure>
     <div class="welcome-card">
       <p class="seal devanagari" lang="hi">ॐ</p>
@@ -89,7 +69,6 @@
         <a class="jump" href="#save-the-date">विवाह की तारीख</a>
         <a class="jump" href="#schedule">विवाह के कार्यक्रम</a>
         <a class="jump" href="#venues">विवाह स्थल</a>
-        <a class="jump" href="#wedding-trailer">विवाह का ट्रेलर</a>
       </nav>
     </div>
   </section>
@@ -127,16 +106,6 @@
         </div>
       </div>
     </div>
-  </section>
-
-  <section class="trailer-section" id="wedding-trailer" aria-labelledby="trailer-title">
-    <h2 id="trailer-title">विवाह का ट्रेलर</h2>
-    <p>पूरा ट्रेलर चलाएँ या नीचे कोई समारोह चुनें।</p>
-    <video id="trailer-player" width="576" height="384" controls playsinline preload="none"
-      poster="/shubh-vivah/photos/haveli-entrance.webp" aria-labelledby="trailer-title">
-      <source src="/shubh-vivah/photos/wedding-trailer.mp4" type="video/mp4">
-    </video>
-    <div class="trailer-chapters" id="trailer-chapters" role="group" aria-label="समारोह का वीडियो चुनें"></div>
   </section>
 
   <section id="schedule" class="schedule" aria-labelledby="schedule-title">
