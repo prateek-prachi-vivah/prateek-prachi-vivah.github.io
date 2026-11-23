@@ -154,6 +154,7 @@ for (const [index, event] of wedding.events.entries()) {
   art.height = 1024;
   art.decoding = 'async';
   art.loading = 'lazy';
+  art.fetchPriority = index === 0 ? 'auto' : 'low';
   const body = create('div', 'event-body');
   const time = create('time', 'event-date', longDate.format(dateFrom(event.date)));
   time.dateTime = event.date;
@@ -173,7 +174,9 @@ for (const [index, event] of wedding.events.entries()) {
   }
   body.append(dress, create('p', 'message', event.message));
   if (event.note) body.append(create('p', 'event-note', event.note));
-  card.append(art, body);
+  const frame = create('div', 'event-art-frame');
+  frame.append(art);
+  card.append(frame, body);
   carousel.append(card);
   const dot = create('button', 'dot');
   dot.type = 'button';
@@ -182,6 +185,7 @@ for (const [index, event] of wedding.events.entries()) {
   thumbnail.removeAttribute('width');
   thumbnail.removeAttribute('height');
   thumbnail.className = 'event-thumbnail';
+  thumbnail.alt = '';
   thumbnail.setAttribute('aria-hidden', 'true');
   dot.append(thumbnail);
   dot.addEventListener('click', () => showCard(index));
@@ -203,17 +207,15 @@ scheduleView.addEventListener('click', () => {
     : (isHindi ? 'सभी समारोह एक साथ देखें' : 'View all celebrations');
   swipeHint.hidden = listView;
   if (!listView) {
-    const card = cards[active];
-    carousel.scrollTo({
-      left: card.offsetLeft - (carousel.clientWidth - card.offsetWidth) / 2,
-      behavior: 'instant'
-    });
+    showCard(active, 'instant');
   }
 });
 let active = -1;
+let requestedCard = null;
 let announced = -1;
 let settleTimer;
 function announceCard() {
+  requestedCard = null;
   if (announced === active) return;
   cards[announced]?.classList.remove('entering');
   cards[active].classList.add('entering');
@@ -233,13 +235,12 @@ function selectCard(index) {
     dots.children[position].setAttribute('aria-current', position === index ? 'true' : 'false');
   }
 }
-function showCard(index) {
+function showCard(index, scrollBehavior = behavior()) {
   const position = (index + cards.length) % cards.length;
   const card = cards[position];
-  carousel.scrollTo({
-    left: card.offsetLeft - (carousel.clientWidth - card.offsetWidth) / 2,
-    behavior: behavior()
-  });
+  const left = card.offsetLeft - (carousel.clientWidth - card.offsetWidth) / 2;
+  requestedCard = Math.abs(left - carousel.scrollLeft) > 1 ? position : null;
+  carousel.scrollTo({ left, behavior: scrollBehavior });
 }
 selectCard(0);
 announceCard();
@@ -258,13 +259,13 @@ carousel.addEventListener('scroll', () => {
     settleTimer = setTimeout(announceCard, 130);
   });
 }, { passive: true });
-document.querySelector('#previous-event').addEventListener('click', () => showCard(active - 1));
-document.querySelector('#next-event').addEventListener('click', () => showCard(active + 1));
+document.querySelector('#previous-event').addEventListener('click', () => showCard((requestedCard ?? active) - 1));
+document.querySelector('#next-event').addEventListener('click', () => showCard((requestedCard ?? active) + 1));
 carousel.addEventListener('keydown', event => {
   if (listView) return;
   if (!['ArrowLeft', 'ArrowRight'].includes(event.key)) return;
   event.preventDefault();
-  showCard(active + (event.key === 'ArrowRight' ? 1 : -1));
+  showCard((requestedCard ?? active) + (event.key === 'ArrowRight' ? 1 : -1));
 });
 
 function mapsLink(action, parameters) {
@@ -356,6 +357,7 @@ if ('IntersectionObserver' in window && !motion.matches) {
       if (!entry.isIntersecting) continue;
       reveal.unobserve(entry.target);
       const photoCard = entry.target.matches('.venue-card');
+      if (motion.matches) continue;
       const frames = photoCard
         ? [{ opacity: .64, transform: 'perspective(900px) rotateX(8deg) translateY(15px)' },
            { opacity: 1, transform: 'perspective(900px) rotateX(0deg) translateY(0)' }]

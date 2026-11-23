@@ -246,7 +246,7 @@ footer :is(.seal,.eyebrow,.closing,.jump,a) { color: var(--light); }
 .film-periphery, .film-shot::before {
   position: absolute;
   inset: -1.6rem;
-  background: var(--frame-photo, url('./ganesh.webp')) center 45% / cover;
+  background: var(--frame-photo, url('../vaikuntha/ganesha.webp')) center 45% / cover;
   filter: blur(22px) brightness(.6);
 }
 .film-shot::before { content: ''; }
@@ -299,7 +299,7 @@ footer :is(.seal,.eyebrow,.closing,.jump,a) { color: var(--light); }
   width: min(100%,42rem);
   grid-area: 1 / 1;
   position: relative;
-  perspective: 1450px;
+  perspective: clamp(620px, 112vw, 1250px);
   transform-style: preserve-3d;
 }
 .book-jacket {
@@ -324,13 +324,13 @@ footer :is(.seal,.eyebrow,.closing,.jump,a) { color: var(--light); }
 .welcome.scene.book-opening .book-jacket { display: grid; animation: turn-jacket 1.18s cubic-bezier(.23,.6,.17,1) both; }
 .welcome.scene.book-opening .book-reveal { animation: arrive-book 1.16s cubic-bezier(.2,.65,.21,1) both; }
 @keyframes turn-jacket {
-  0%, 16% { transform: rotateY(0); opacity: 1; }
+  0%, 15% { transform: translateZ(2px) rotateY(0); opacity: 1; }
   78% { opacity: 1; }
-  100% { transform: rotateY(-157deg); opacity: 0; }
+  100% { transform: translateZ(2px) rotateY(-151deg); opacity: 0; }
 }
 @keyframes arrive-book {
-  from { transform: translateY(18px) scale(.94); }
-  to { transform: translateY(0) scale(1); }
+  from { transform: perspective(1100px) translate3d(0, 16px, -32px) rotateX(4deg); }
+  to { transform: perspective(1100px) translate3d(0, 0, 0) rotateX(0); }
 }
 .welcome .welcome-card {
   width: 100%;
@@ -411,9 +411,6 @@ footer :is(.seal,.eyebrow,.closing,.jump,a) { color: var(--light); }
   .film-poster, .film-shot > img, .welcome.scene.book-opening :is(.book-jacket,.book-reveal) { animation: none; }
   .welcome.scene.book-opening .book-jacket { display: none; }
 }
-@media (max-width: 650px) {
-  .film-periphery { --frame-photo: url('./ganesh-mobile.webp'); }
-}
 
 /* Keep navigation in document flow so it cannot obscure the schedule or venue content. */
 .invite-tools {
@@ -441,7 +438,7 @@ footer :is(.seal,.eyebrow,.closing,.jump,a) { color: var(--light); }
 }
 .film-periphery, .film-shot::before {
   filter: saturate(.77) brightness(.55);
-  background-image: linear-gradient(#231c2cd9,#543423d9 48%,#231c2cf0), var(--frame-photo, url('./ganesh.webp'));
+  background-image: linear-gradient(#231c2cd9,#543423d9 48%,#231c2cf0), var(--frame-photo, url('../vaikuntha/ganesha.webp'));
 }
 html:not(.intro-open) .intro.is-dissolving:not([hidden]) {
   pointer-events: none;
@@ -462,12 +459,12 @@ html:not(.intro-open) .intro.is-dissolving:not([hidden]) {
   max-height: 84svh;
   aspect-ratio: var(--portal-ratio);
   transform: translate(-50%,-50%);
-  animation: pass-portal 1.2s cubic-bezier(.28,.44,.15,1) both;
+  animation: pass-portal .84s cubic-bezier(.25,.55,.18,1) both;
 }
-.film-shot[data-gate="entry"] .portal, .film-shot[data-gate="1"] .portal { width: min(98vw,57svh); }
+.film-shot[data-gate="entry"] .portal, .film-shot[data-gate="1"] .portal { width: min(98vw,56svh); }
 @keyframes pass-portal {
-  0% { transform: translate(-50%,-50%) scale(.98); }
-  100% { transform: translate(-50%,-50%) scale(1.1); }
+  0% { transform: translate(-50%,-50%) scale(.995); }
+  100% { transform: translate(-50%,-50%) scale(1.085); }
 }
 .portal .portal-architecture {
   width: 100%;
@@ -506,7 +503,7 @@ html:not(.intro-open) .intro.is-dissolving:not([hidden]) {
   position: absolute;
   inset: 0;
   display: flex;
-  perspective: clamp(180px,31vw,620px);
+  perspective: clamp(150px,26vw,520px);
   perspective-origin: 50% 50%;
   transform-style: preserve-3d;
 }
@@ -613,7 +610,7 @@ html:not(.intro-open) .intro.is-dissolving:not([hidden]) {
 }
 
 .film-shot[data-shot="vishnu"] {
-  --frame-photo: url('./narayana-sculptural.webp');
+  --frame-photo: url('./vishnu.webp');
   transform-style: preserve-3d;
 }
 .film-shot[data-shot="vishnu"] > img { animation: narayana-depth 1.9s ease-out both; }
@@ -629,7 +626,6 @@ html:not(.intro-open) .intro.is-dissolving:not([hidden]) {
   html:not(.intro-open) .intro.is-dissolving { display: none; }
 }
 
-.film-periphery { --frame-photo: url('./ganesh-mobile.webp'); }
 .film-shot[data-gate] .portal-leaf { animation-duration: .74s; }
 .film-shot[data-gate="7"] .portal-leaf { animation-duration: 1.02s; }
 .film-shot[data-gate] .portal-aperture::after {
@@ -649,4 +645,38 @@ html:not(.intro-open) .intro.is-dissolving:not([hidden]) {
 }
 @media (prefers-reduced-motion: reduce) {
   .film-shot[data-gate] .portal-aperture::after { animation: none; }
+}
+
+/* Define depth with the page edge and frame while leaving the art unfiltered. */
+.book-jacket::before {
+  content: '';
+  position: absolute;
+  inset: .55rem auto .55rem .35rem;
+  width: .22rem;
+  border-radius: 1rem;
+  background: linear-gradient(#f5d7a0a0, #a46734, #f5d7a080);
+  pointer-events: none;
+}
+.welcome .welcome-card {
+  box-shadow: 4px 4px 0 #dbc49b, 7px 7px 0 #97724e,
+    0 25px 55px #1a10269c, inset 8px 0 17px #754d3021;
+}
+.event-art-frame {
+  display: grid;
+  aspect-ratio: 3 / 2;
+  background: #352830;
+  box-shadow: 0 3px 12px #4e2c2840;
+  z-index: 1;
+  overflow: hidden;
+}
+.carousel-nav .dot::before { content: none; }
+.schedule .event-card {
+  box-shadow: 0 3px 0 #694751, 0 14px 24px #180f2255;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .schedule:not(.schedule-list) .event-card {
+    transform: perspective(950px) translateZ(-18px) rotateX(2deg) scale(.97);
+    transition: transform .42s cubic-bezier(.18,.63,.26,1), opacity .35s ease;
+  }
+  .schedule:not(.schedule-list) .event-card.active { transform: none; }
 }

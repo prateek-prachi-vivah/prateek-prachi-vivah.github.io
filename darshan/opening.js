@@ -1,4 +1,4 @@
-import { weddingAudio } from './audio.js?v=8';
+import { weddingAudio } from './audio.js?v=9';
 
 const root = document.documentElement;
 const intro = document.querySelector('#top');
@@ -26,9 +26,9 @@ const audio = weddingAudio({
 clearTimeout(window.invitationFallback);
 
 function artUrl(name) {
-  const smallScene = name === 'entry' || name === 'hall';
+  const smallScene = name === 'entry' || name === 'hall' || name === 'vishnu';
   const asset = smallScene && matchMedia('(max-width: 650px)').matches ? name + '-mobile' : name;
-  return new URL((name === 'vishnu' ? 'narayana-sculptural' : asset) + '.webp', import.meta.url).href;
+  return new URL(asset + '.webp', import.meta.url).href;
 }
 
 function load(name) {
@@ -154,7 +154,7 @@ async function play() {
       caption.textContent = sceneList.dataset.gateLabel + ' ' + number + ' / 7';
       audio.cue(number === 7 ? 'sanctum' : 'door');
     }
-    await wait(number === 7 ? 1150 : 810);
+    await wait(number === 7 ? 1190 : 835);
     if (token !== run) return;
   }
 
