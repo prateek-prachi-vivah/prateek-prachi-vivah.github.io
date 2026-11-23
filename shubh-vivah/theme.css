@@ -252,3 +252,193 @@ html[lang="hi"] .cover-copy h2 { line-height:1.12 }
   47% { transform: rotate(-8deg); }
   72% { transform: rotate(4deg); }
 }
+
+/* Gilded arch, rose paper and jewel-toned accents */
+.cover::after {
+  border: 1px solid #f1c980b5;
+  box-shadow: inset 0 0 0 4px #33172f, inset 0 0 0 5px #c9945f80;
+}
+.welcome-card { border: 3px double #9e6a43; box-shadow: 0 1rem 2.5rem #411b3840; }
+.schedule {
+  background: radial-gradient(ellipse at top left, #f2c5d6, transparent 52%),
+    radial-gradient(ellipse at top right, #c7e4d4, transparent 55%), #fff6e5;
+}
+.event-card { border: 1px solid #c99e67; border-top: 4px solid var(--event-accent, #812550); }
+.event-body { background: linear-gradient(155deg, #fff2d8 0%, #fffaf1 70%); }
+.event-art { align-self: start; height: auto; object-fit: contain; }
+.venue-photo-frame { border: 3px double #b68551; }
+.venue-photo-caption { background: linear-gradient(110deg, #7a244d, #35463e 80%); }
+@media (prefers-reduced-motion: no-preference) {
+  .cover-closed .cover-copy { animation: cover-copy-arrival .7s ease-out both; }
+  .carousel { scroll-behavior: smooth; }
+  .event-card.entering .event-art { animation: event-art-arrival .5s ease-out both; }
+}
+@keyframes cover-copy-arrival {
+  from { opacity: .25; transform: translateY(.6rem); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes event-art-arrival {
+  from { opacity: .65; transform: translateY(.25rem); }
+  to { opacity: 1; transform: none; }
+}
+
+/* A palace doorway opens onto the invitation and its illustrated program. */
+.cover-film {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  pointer-events: none;
+}
+.cover-film.is-playing { opacity: .48; }
+.cover-copy { text-shadow: 0 2px 16px #210e1b; }
+.cover-content { position: relative; z-index: 1; }
+.welcome {
+  width: min(100%, 90rem);
+  display: grid;
+  grid-template-columns: minmax(0, .95fr) minmax(0, 1.05fr);
+  gap: clamp(1rem, 4vw, 5rem);
+  min-height: min(50rem, 100svh);
+  margin: auto;
+  padding: clamp(1.5rem, 5vw, 5rem);
+}
+.welcome-art {
+  align-self: center;
+  width: 100%;
+  margin: 0;
+  padding: .5rem;
+  border: 1px solid #b68855;
+  border-radius: 48% 48% .5rem .5rem / 28% 28% .5rem .5rem;
+  background: #fbebcc;
+  box-shadow: 0 1rem 2rem #4a202b29;
+}
+.welcome-art img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  border-radius: inherit;
+}
+.welcome-card { padding: clamp(1.1rem, 4vw, 3rem); }
+.schedule { padding-block: clamp(2.75rem, 7vw, 6rem); }
+.carousel-nav { max-width: min(94vw, 43rem); margin-inline: auto; }
+.carousel-nav .dots { min-width: 0; flex: 1; gap: clamp(.18rem, .7vw, .45rem); }
+.carousel-nav .dot {
+  flex: 1 1 0;
+  min-width: 0;
+  width: auto;
+  height: auto;
+  aspect-ratio: 1;
+  border: 2px solid transparent;
+  padding: .12rem;
+  border-radius: .28rem;
+  background: #fbedd8;
+}
+.carousel-nav .dot[aria-current="true"] {
+  border-color: #87284e;
+  background: #fff6e6;
+}
+.event-thumbnail {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: .12rem;
+}
+.event-card { border-top-color: var(--accent, #812550); }
+.venues { padding-top: clamp(2.75rem, 7vw, 6rem); }
+@media (max-width: 690px) {
+  .welcome { grid-template-columns: 1fr; min-height: auto; }
+  .welcome-art { width: min(100%, 29rem); order: 1; }
+  .welcome-art img { aspect-ratio: 4 / 3; }
+  .carousel-nav .dot { min-height: 24px; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .cover-film { transition: opacity .55s ease; }
+  .welcome.arriving .welcome-art { animation: event-art-arrival .7s ease-out both; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cover-film { display: none; }
+}
+
+.schedule-view {
+  min-height: 44px;
+  margin: .6rem auto .35rem;
+  padding: .55rem 1rem;
+  border: 1px solid #a57b47;
+  border-radius: 2rem;
+  background: #fff7e4;
+  color: #6f2248;
+  font: inherit;
+  cursor: pointer;
+}
+.schedule-view[aria-pressed="true"] { background: #6f2248; color: #fff7e4; }
+.schedule-view:focus-visible, .event-thumbnail:focus-visible {
+  outline: 2px solid #7d2954;
+  outline-offset: 3px;
+}
+.schedule-list .carousel-nav, .schedule-list .current-event { display: none; }
+.schedule-list .carousel {
+  display: grid;
+  width: min(92%, 64rem);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.1rem;
+  margin: 1.5rem auto 0;
+  padding: 0;
+  overflow: visible;
+  scroll-snap-type: none;
+}
+.schedule-list .event-card {
+  width: auto;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  opacity: 1;
+  transform: none;
+}
+.schedule-list .event-body { border: 0; }
+@media (max-width: 690px) {
+  .schedule-list .carousel { grid-template-columns: 1fr; }
+}
+
+.trailer-section {
+  padding: clamp(2.5rem, 6vw, 5.5rem) clamp(1rem, 4vw, 3rem);
+  text-align: center;
+  color: #fff4da;
+  background: radial-gradient(ellipse at top, #772b52, #301726 68%);
+}
+.trailer-section h2 { color: #ffe0a4; margin: 0 0 .45rem; }
+.trailer-section > p { margin: 0 0 1.1rem; }
+.trailer-section video {
+  display: block;
+  width: min(100%, 45rem);
+  height: auto;
+  margin: 0 auto;
+  border: 3px double #d9ac6a;
+  border-radius: .65rem;
+  background: #22151b;
+}
+.trailer-chapters {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: .45rem;
+  max-width: 49rem;
+  margin: 1rem auto 0;
+}
+.trailer-chapter {
+  min-height: 44px;
+  padding: .45rem .75rem;
+  border: 1px solid #c59165;
+  border-radius: 1.5rem;
+  background: #412538;
+  color: #fff4da;
+  font: inherit;
+  cursor: pointer;
+}
+.trailer-chapter[aria-current="true"] { background: #ffe0a4; color: #391a2c; }
+.trailer-chapter:focus-visible { outline: 2px solid #ffe0a4; outline-offset: 3px; }
