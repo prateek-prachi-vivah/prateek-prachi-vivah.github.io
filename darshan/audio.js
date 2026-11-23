@@ -23,9 +23,7 @@ export function weddingAudio({ source, control, hindi, isCardOpen }) {
   let generation = 0;
   let loading = false;
   let failed = false;
-  let permitted = preference === 'on';
   let lastCue = -1;
-  let startingFromGesture = false;
 
   function show() {
     const playing = Boolean(active && (!active.native || !active.native.paused));
@@ -37,7 +35,6 @@ export function weddingAudio({ source, control, hindi, isCardOpen }) {
 
   function remember(value) {
     preference = value;
-    permitted = value === 'on';
     try { sessionStorage.setItem(preferenceKey, value); } catch {}
   }
 
@@ -80,7 +77,6 @@ export function weddingAudio({ source, control, hindi, isCardOpen }) {
     return player.play().then(() => {
       if (token !== generation || preference === 'off' || document.hidden) return;
       active = { native: player, phase: index };
-      permitted = true;
     });
   }
 
@@ -107,10 +103,9 @@ export function weddingAudio({ source, control, hindi, isCardOpen }) {
     }
 
     try {
-      // Use the loaded media directly inside the first tap. Keep that same element
+      // Use the loaded media directly inside the sound control handler. Keep that same element
       // authorized for the bhajan on browsers with per-element autoplay rules.
       if (gesture && !active) {
-        startingFromGesture = true;
         await startNative(token, index);
         return;
       }
@@ -139,7 +134,6 @@ export function weddingAudio({ source, control, hindi, isCardOpen }) {
             node.disconnect();
             gain.disconnect();
           };
-          permitted = true;
           return;
         }
       }
@@ -147,7 +141,6 @@ export function weddingAudio({ source, control, hindi, isCardOpen }) {
     } catch {
       if (token === generation) failed = gesture;
     } finally {
-      if (gesture) startingFromGesture = false;
       if (token === generation) { loading = false; show(); }
     }
   }
@@ -196,18 +189,8 @@ export function weddingAudio({ source, control, hindi, isCardOpen }) {
 
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) stop();
-    else if (permitted) play();
+    else play();
   });
-  function activateOnInteraction(event) {
-    if (!event.isTrusted || event.target.closest?.('#sound-toggle') ||
-        preference === 'off' || active || startingFromGesture) return;
-    play({ gesture: true });
-  }
-  // Touch activation arrives at pointer-up, before the compatibility click.
-  document.addEventListener('pointerup', event => {
-    if (event.pointerType !== 'mouse') activateOnInteraction(event);
-  }, { capture: true, passive: true });
-  document.addEventListener('click', activateOnInteraction, { capture: true });
   show();
   return {
     prepare() { usePhase(0, true); },

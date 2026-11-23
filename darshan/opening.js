@@ -1,4 +1,4 @@
-import { weddingAudio } from './audio.js?v=7';
+import { weddingAudio } from './audio.js?v=8';
 
 const root = document.documentElement;
 const intro = document.querySelector('#top');
@@ -54,10 +54,14 @@ function reveal({ cinematic = false, focus = false } = {}) {
   clearTimeout(hardStop);
   opened = true;
   root.classList.remove('intro-open');
-  intro.hidden = true;
+  const animate = cinematic && !motion.matches;
+  if (animate) {
+    intro.inert = true;
+    intro.classList.add('is-dissolving');
+  } else intro.hidden = true;
   document.body.classList.add('card-visible');
   main.inert = footer.inert = false;
-  if (cinematic && !motion.matches) {
+  if (animate) {
     welcome.classList.remove('book-opening');
     requestAnimationFrame(() => {
       if (opened) welcome.classList.add('book-opening');
@@ -113,7 +117,7 @@ function setFrame(name, image, { inside, gate } = {}) {
   }
   const previous = stage.lastElementChild;
   stage.append(layer);
-  if (previous) setTimeout(() => previous.remove(), 285);
+  if (previous) setTimeout(() => previous.remove(), 470);
 }
 
 async function play() {
@@ -121,6 +125,8 @@ async function play() {
   opened = false;
   main.inert = footer.inert = true;
   intro.hidden = false;
+  intro.inert = false;
+  intro.classList.remove('is-dissolving');
   document.body.classList.remove('card-visible');
   root.classList.add('intro-open');
   intro.classList.add('is-playing');
@@ -163,6 +169,9 @@ async function play() {
   reveal({ cinematic: true, focus: document.activeElement === skip });
 }
 
+intro.addEventListener('animationend', event => {
+  if (opened && event.target === intro && event.animationName === 'darshan-dissolve') intro.hidden = true;
+});
 skip.addEventListener('click', event => {
   event.preventDefault();
   reveal({ focus: true });
