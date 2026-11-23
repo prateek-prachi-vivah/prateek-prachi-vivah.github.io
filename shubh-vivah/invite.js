@@ -148,10 +148,11 @@ for (const [index, event] of wedding.events.entries()) {
   card.style.setProperty('--accent', event.accent);
   card.id = 'celebration-' + (index + 1);
   const art = create('img', 'event-art');
-  art.src = '/darshan/devotional-ceremony-' + (index + 1) + '.webp';
+  const restoredArtwork = index >= 2 && index <= 4;
+  art.src = '/darshan/' + (restoredArtwork ? 'rajputana-ceremony-' : 'devotional-ceremony-') + (index + 1) + '.webp';
   art.alt = ceremonyArtwork[index] || event.title;
-  art.width = 768;
-  art.height = 512;
+  art.width = restoredArtwork ? 1536 : 768;
+  art.height = restoredArtwork ? 1024 : 512;
   art.decoding = 'async';
   art.loading = 'lazy';
   const body = create('div', 'event-body');
