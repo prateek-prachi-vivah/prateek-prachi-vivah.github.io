@@ -28,9 +28,9 @@
 <link rel="stylesheet" href="/styles.css">
 <link rel="stylesheet" href="/rajputana/theme.css">
 <link rel="stylesheet" href="/shubh-vivah/theme.css?v=53">
-<link rel="stylesheet" href="/darshan/theme.css?v=10">
+<link rel="stylesheet" href="/darshan/theme.css?v=11">
 <script type="module" src="/shubh-vivah/invite.js?v=41"></script>
-<script type="module" src="/darshan/opening.js?v=10"></script>
+<script type="module" src="/darshan/opening.js?v=11"></script>
 <link rel="preload" as="image" href="/vaikuntha/ganesha.webp" fetchpriority="high">
 <link rel="icon" href="/assets/wedding-arch.svg" type="image/svg+xml">
 <script>if (new URLSearchParams(location.search).get('lang') === 'en') location.replace('/prateek-prachi-vivah/english/' + location.search + location.hash)</script>
@@ -44,13 +44,13 @@
   <a href="/prateek-prachi-vivah/english/" lang="en" hreflang="en">English</a>
   <button type="button" id="sound-toggle" aria-pressed="false">गणेश भजन चालू करें</button>
 </nav>
-<audio id="wedding-music" src="/darshan/vaikuntha-flute-balanced.mp3" data-card-src="/shubh-vivah/ganesh-bhajan-soft.mp3" preload="auto" loop></audio>
+<audio id="wedding-music" src="/darshan/vaikuntha-flute-balanced.mp3" data-opening-src="/darshan/vaikuntha-flute-balanced.mp3" data-card-src="/shubh-vivah/ganesh-bhajan-soft.mp3" preload="auto" loop></audio>
 <script>
 (() => {
   try { if (sessionStorage.getItem('wedding-audio-v2') === 'off') return; } catch {}
   const track = document.getElementById('wedding-music');
-  if (!document.documentElement.classList.contains('intro-open')) return;
-  // Request the opening track before the animation modules finish loading.
+  if (!document.documentElement.classList.contains('intro-open')) track.src = track.dataset.cardSrc;
+  // Request the first track before the animation modules finish loading.
   track.play().catch(() => {});
 })();
 </script>
@@ -79,10 +79,14 @@
       <img src="/darshan/mandap.webp" srcset="/darshan/mandap-mobile.webp 760w, /darshan/mandap.webp 1024w" sizes="(max-width: 650px) 760px, 1024px" alt="दीपों और गेंदे के फूलों से सजा राजपूताना विवाह मंडप" width="1024" height="1536" loading="lazy" decoding="async">
     </figure>
     <div class="book-reveal">
+      <div class="book-page-edge" aria-hidden="true"></div>
       <div class="book-jacket" aria-hidden="true">
+        <div class="book-face book-front">
         <span class="book-mark">P <small>&amp;</small> P</span>
         <p lang="sa">श्री गणेशाय नमः</p>
         <strong>शुभ विवाह</strong>
+        </div>
+        <div class="book-face book-back"></div>
       </div>
       <div class="welcome-card">
       <p class="seal devanagari" lang="hi">ॐ</p>
