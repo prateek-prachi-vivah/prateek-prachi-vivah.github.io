@@ -2,9 +2,8 @@ const preferenceKey = 'wedding-audio-v2';
 
 /** A single transport keeps the Vaikuntha score and Ganesh bhajan from overlapping. */
 export function weddingAudio({ source, control, hindi, isCardOpen }) {
-  const score = new Audio(new URL('./vaikuntha-flute.mp3', import.meta.url));
-  score.preload = 'none';
-  const tracks = [score, source];
+  const tracks = [new URL('./vaikuntha-flute.mp3', import.meta.url).href, source.src];
+  source.preload = 'auto';
   const levels = [.78, 2.05];
   const positions = [0, 0];
   const buffers = [];
@@ -42,7 +41,7 @@ export function weddingAudio({ source, control, hindi, isCardOpen }) {
   }
 
   function load(index) {
-    buffers[index] ??= fetch(tracks[index].src)
+    buffers[index] ??= fetch(tracks[index])
       .then(response => {
         if (!response.ok) throw new Error('Unable to load soundtrack');
         return response.arrayBuffer();
@@ -72,17 +71,13 @@ export function weddingAudio({ source, control, hindi, isCardOpen }) {
   }
 
   function startNative(token, index) {
-    const player = tracks[index];
+    const player = source;
+    if (player.src !== tracks[index]) player.src = tracks[index];
     player.loop = true;
     player.volume = index ? 1 : .75;
-    if (positions[index] > 0) {
-      try { player.currentTime = positions[index]; } catch {}
-    }
+    try { player.currentTime = positions[index]; } catch {}
     return player.play().then(() => {
-      if (token !== generation || preference === 'off' || document.hidden) {
-        if (active?.native !== player) player.pause();
-        return;
-      }
+      if (token !== generation || preference === 'off' || document.hidden) return;
       active = { native: player, phase: index };
       permitted = true;
     });
@@ -156,7 +151,7 @@ export function weddingAudio({ source, control, hindi, isCardOpen }) {
     generation++;
     loading = failed = false;
     end(.08);
-    for (const track of tracks) if (!track.paused) track.pause();
+    source.pause();
     show();
   }
 
@@ -190,22 +185,18 @@ export function weddingAudio({ source, control, hindi, isCardOpen }) {
   }
 
   control.addEventListener('click', () => {
-    if (active || (loading && permitted)) { remember('off'); stop(); }
+    if (active || (loading && preference === 'on')) { remember('off'); stop(); }
     else { remember('on'); play({ gesture: true }); }
   });
-  for (const player of tracks) {
-    player.addEventListener('ended', () => {
-      if (active?.native === player) { active = undefined; show(); }
-    });
-  }
+
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) stop();
     else if (permitted) play();
   });
   document.addEventListener('click', event => {
-    if (event.target.closest('#sound-toggle') || active || loading || preference === 'off') return;
+    if (event.target.closest('#sound-toggle') || preference === 'off' || (active && !active.native)) return;
     play({ gesture: true });
-  });
+  }, { capture: true });
   show();
   return {
     prepare() {
