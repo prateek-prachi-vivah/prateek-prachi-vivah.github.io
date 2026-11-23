@@ -1,4 +1,4 @@
-import { weddingAudio } from './audio.js?v=2';
+import { weddingAudio } from './audio.js?v=3';
 
 const root = document.documentElement;
 const intro = document.querySelector('#top');
@@ -55,6 +55,7 @@ function reveal({ cinematic = false, focus = false } = {}) {
   opened = true;
   root.classList.remove('intro-open');
   intro.hidden = true;
+  document.body.classList.add('card-visible');
   main.inert = footer.inert = false;
   if (cinematic && !motion.matches) {
     welcome.classList.remove('book-opening');
@@ -74,11 +75,34 @@ function setFrame(name, image, { inside, gate } = {}) {
   layer.style.setProperty('--frame-photo', 'url("' + image.src + '")');
   if (gate) {
     layer.dataset.gate = String(gate);
+    const portal = document.createElement('div');
+    portal.className = 'portal';
+    portal.style.setProperty('--portal-ratio', gate === 1 ? '2 / 3' : '764 / 337');
+    image.className = 'portal-architecture';
+
     const aperture = document.createElement('div');
-    aperture.className = 'gate-opening';
-    aperture.style.setProperty('--gate', 'url("' + image.src + '")');
-    aperture.append(document.createElement('span'), document.createElement('span'));
-    layer.append(inside, aperture);
+    aperture.className = 'portal-aperture';
+    const [left, top, width, height] = gate === 1 ? [28, 26, 44, 64] : [27, 14, 46, 79];
+    for (const [key, value] of Object.entries({ left, top, width, height })) {
+      aperture.style.setProperty('--portal-' + key, value + '%');
+    }
+    aperture.style.setProperty('--door-texture', 'url("' + image.src + '")');
+    aperture.style.setProperty('--texture-size', (20000 / width) + '% ' + (10000 / height) + '%');
+    aperture.style.setProperty('--texture-left', (100 * left / (100 - width / 2)) + '%');
+    aperture.style.setProperty('--texture-right', (100 * (left + width / 2) / (100 - width / 2)) + '%');
+    aperture.style.setProperty('--texture-y', (100 * top / (100 - height)) + '%');
+
+    inside.className = 'portal-interior';
+    const doors = document.createElement('div');
+    doors.className = 'portal-doors';
+    for (const side of ['left', 'right']) {
+      const leaf = document.createElement('span');
+      leaf.className = 'portal-leaf ' + side;
+      doors.append(leaf);
+    }
+    aperture.append(inside, doors);
+    portal.append(image, aperture);
+    layer.append(portal);
     caption.textContent = sceneList.dataset.gateLabel + ' ' + gate + ' / 7';
     intro.setAttribute('aria-label', caption.textContent);
     audio.cue(gate === 7 ? 'sanctum' : 'door');
@@ -87,7 +111,9 @@ function setFrame(name, image, { inside, gate } = {}) {
     caption.textContent = scenes[name].textContent;
     intro.setAttribute('aria-label', scenes[name].dataset.description);
   }
-  stage.replaceChildren(layer);
+  const previous = stage.lastElementChild;
+  stage.append(layer);
+  if (previous) setTimeout(() => previous.remove(), 285);
 }
 
 async function play() {
@@ -95,19 +121,20 @@ async function play() {
   opened = false;
   main.inert = footer.inert = true;
   intro.hidden = false;
+  document.body.classList.remove('card-visible');
   root.classList.add('intro-open');
   intro.classList.add('is-playing');
   stage.replaceChildren();
   caption.textContent = scenes.ganesh.textContent;
   intro.setAttribute('aria-label', scenes.ganesh.dataset.description);
   audio.prepare();
-  hardStop = setTimeout(() => reveal({ cinematic: true }), 14500);
+  hardStop = setTimeout(() => reveal({ cinematic: true }), 16300);
   load('entry');
   load('hall');
   load('vishnu');
   // The poster is already visible. Downloads enhance later frames and cannot delay the first one.
   for (let number = 2; number <= 7; number++) load('door-' + number);
-  await wait(1550);
+  await wait(1700);
   if (token !== run) return;
   for (let number = 1; number <= 7; number++) {
     const name = number === 1 ? 'entry' : 'door-' + number;
@@ -121,11 +148,11 @@ async function play() {
       caption.textContent = sceneList.dataset.gateLabel + ' ' + number + ' / 7';
       audio.cue(number === 7 ? 'sanctum' : 'door');
     }
-    await wait(number === 7 ? 1080 : 760);
+    await wait(number === 7 ? 1180 : 910);
     if (token !== run) return;
   }
 
-  for (const [name, duration] of [['vishnu', 2350], ['mandap', 1050]]) {
+  for (const [name, duration] of [['vishnu', 2400], ['mandap', 1000]]) {
     const image = await getArt(name, 500);
     if (token !== run) return;
     if (!image) continue;
@@ -163,6 +190,7 @@ motion.addEventListener('change', event => {
 
 if (opened) {
   intro.hidden = true;
+  document.body.classList.add('card-visible');
   if (location.hash) requestAnimationFrame(() => document.getElementById(location.hash.slice(1))?.scrollIntoView());
 } else {
   play();

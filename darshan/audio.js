@@ -1,177 +1,214 @@
 const preferenceKey = 'wedding-audio-v2';
-const levels = { opening: 1.65, card: 2.75 };
 
-/** Reuse the original credited Ganesh bhajan across both scenes and the card. */
+/** A single transport keeps the Vaikuntha score and Ganesh bhajan from overlapping. */
 export function weddingAudio({ source, control, hindi, isCardOpen }) {
+  const score = new Audio(new URL('./vaikuntha-score.mp3', import.meta.url));
+  score.preload = 'none';
+  const tracks = [score, source];
+  const levels = [.78, 2.05];
+  const positions = [0, 0];
+  const buffers = [];
   const labels = hindi ? {
-    on: 'भक्ति संगीत सुनें', off: 'ध्वनि बंद करें',
-    play: 'गणेश भजन सुनें', pause: 'भजन रोकें', loading: 'संगीत लोड हो रहा है'
+    play: ['वैकुंठ संगीत सुनें', 'गणेश भजन सुनें'],
+    pause: 'ध्वनि बंद करें', waiting: 'संगीत लोड हो रहा है', retry: 'संगीत फिर चलाएँ'
   } : {
-    on: 'Play devotional music', off: 'Mute sound',
-    play: 'Play Ganesh bhajan', pause: 'Pause bhajan', loading: 'Loading music'
+    play: ['Play Vaikuntha music', 'Play Ganesh bhajan'],
+    pause: 'Mute sound', waiting: 'Loading sound', retry: 'Retry sound'
   };
-  let choice;
-  try { choice = sessionStorage.getItem(preferenceKey); } catch {}
-  let context, mix, decoded, track, gain, startedAt, roomFade;
-  let offset = 0;
-  let sequence = 0;
-  let pending = false;
-  let nativePending = false;
-  let wantsSound = choice === 'on';
-  let lastCue = -Infinity;
 
-  function display() {
-    const sound = Boolean(track || !source.paused);
-    control.dataset.status = sound ? 'playing' : pending || nativePending ? 'loading' : 'paused';
-    control.setAttribute('aria-pressed', String(sound));
-    control.textContent = sound ? (isCardOpen() ? labels.pause : labels.off)
-      : pending || nativePending ? labels.loading : (isCardOpen() ? labels.play : labels.on);
+  let preference;
+  try { preference = sessionStorage.getItem(preferenceKey); } catch {}
+  let context, bus;
+  let active;
+  let phase = Number(isCardOpen());
+  let generation = 0;
+  let loading = false;
+  let failed = false;
+  let permitted = preference === 'on';
+  let lastCue = -1;
+
+  function show() {
+    const playing = Boolean(active && (!active.native || !active.native.paused));
+    control.dataset.track = phase ? 'ganesh' : 'vaikuntha';
+    control.dataset.status = playing ? 'playing' : loading ? 'loading' : failed ? 'retry' : 'paused';
+    control.setAttribute('aria-pressed', String(playing));
+    control.textContent = playing ? labels.pause : loading ? labels.waiting : failed ? labels.retry : labels.play[phase];
   }
 
-  function level() {
-    const next = isCardOpen() ? levels.card : levels.opening;
-    if (track) gain.gain.setTargetAtTime(next, context.currentTime, .24);
-    else {
-      clearInterval(roomFade);
-      const desired = isCardOpen() ? 1 : .78;
-      if (source.paused) {
-        source.volume = desired;
+  function remember(value) {
+    preference = value;
+    permitted = value === 'on';
+    try { sessionStorage.setItem(preferenceKey, value); } catch {}
+  }
+
+  function load(index) {
+    buffers[index] ??= fetch(tracks[index].src)
+      .then(response => {
+        if (!response.ok) throw new Error('Unable to load soundtrack');
+        return response.arrayBuffer();
+      })
+      .then(bytes => context.decodeAudioData(bytes))
+      .catch(error => { buffers[index] = undefined; throw error; });
+    return buffers[index];
+  }
+
+  function end(fade = 0) {
+    const old = active;
+    active = undefined;
+    if (!old) return Promise.resolve();
+    if (old.native) {
+      positions[old.phase] = old.native.currentTime || 0;
+      // iOS can ignore programmatic media volume. Pause before changing tracks.
+      old.native.pause();
+      return Promise.resolve();
+    }
+    const now = context.currentTime;
+    positions[old.phase] = (positions[old.phase] + now - old.start) % old.node.buffer.duration;
+    old.gain.gain.cancelScheduledValues(now);
+    old.gain.gain.setTargetAtTime(0, now, Math.max(.008, fade / 5));
+    old.node.stop(now + Math.max(.045, fade));
+    old.node.onended = () => { old.node.disconnect(); old.gain.disconnect(); };
+    return fade ? new Promise(resolve => setTimeout(resolve, fade * 1000 + 20)) : Promise.resolve();
+  }
+
+  function startNative(token, index) {
+    const player = tracks[index];
+    player.loop = index === 1;
+    player.volume = index ? 1 : .75;
+    if (positions[index] > 0) {
+      try { player.currentTime = positions[index]; } catch {}
+    }
+    return player.play().then(() => {
+      if (token !== generation || preference === 'off' || document.hidden) {
+        if (active?.native !== player) player.pause();
         return;
       }
-      roomFade = setInterval(() => {
-        source.volume += (desired - source.volume) * .17;
-        if (Math.abs(desired - source.volume) < .015) {
-          source.volume = desired;
-          clearInterval(roomFade);
+      active = { native: player, phase: index };
+      permitted = true;
+    });
+  }
+
+  async function play({ gesture = false, fade = 0, fresh = false } = {}) {
+    if (preference === 'off' || document.hidden) return;
+    const token = ++generation;
+    const index = phase;
+    loading = true;
+    failed = false;
+    show();
+
+    let unlocked;
+    if (gesture) {
+      try {
+        const Audio = window.AudioContext || window.webkitAudioContext;
+        if (Audio && !context) {
+          context = new Audio();
+          bus = context.createGain();
+          bus.connect(context.destination);
         }
-      }, 50);
+        if (context) unlocked = context.resume().catch(() => {});
+      } catch {}
+    }
+
+    try {
+      // Call native play directly from the sound button when there is no Web Audio route.
+      if (!context && !active && gesture) {
+        await startNative(token, index);
+        return;
+      }
+      await end(fade);
+      if (token !== generation || document.hidden || preference === 'off') return;
+      if (fresh) positions[index] = 0;
+      if (unlocked) await unlocked;
+      if (context?.state === 'running') {
+        if (index === 0) load(1).catch(() => {});
+        let buffer;
+        try { buffer = await load(index); } catch {}
+        if (token !== generation || document.hidden || preference === 'off') return;
+        if (buffer) {
+          const node = context.createBufferSource();
+          const gain = context.createGain();
+          const start = context.currentTime;
+          node.buffer = buffer;
+          node.loop = index === 1;
+          gain.gain.setValueAtTime(.001, start);
+          gain.gain.linearRampToValueAtTime(levels[index], start + .46);
+          node.connect(gain).connect(bus);
+          node.start(start, positions[index] % buffer.duration);
+          active = { node, gain, start, phase: index };
+          node.onended = () => {
+            if (active?.node === node) { active = undefined; positions[index] = 0; show(); }
+            node.disconnect();
+            gain.disconnect();
+          };
+          permitted = true;
+          return;
+        }
+      }
+      await startNative(token, index);
+    } catch {
+      if (token === generation) failed = gesture;
+    } finally {
+      if (token === generation) { loading = false; show(); }
     }
   }
 
   function stop() {
-    sequence++;
-    pending = nativePending = false;
-    clearInterval(roomFade);
-    if (track) {
-      const now = context.currentTime;
-      const node = track;
-      const nodeGain = gain;
-      offset = (offset + now - startedAt) % node.buffer.duration;
-      nodeGain.gain.cancelScheduledValues(now);
-      nodeGain.gain.setTargetAtTime(0, now, .018);
-      node.stop(now + .075);
-      node.onended = () => { node.disconnect(); nodeGain.disconnect(); };
-      track = undefined;
-    }
-    if (!source.paused) offset = source.currentTime;
-    source.pause();
-    display();
-  }
-
-  function remember(value) {
-    choice = value;
-    wantsSound = value === 'on';
-    try { sessionStorage.setItem(preferenceKey, value); } catch {}
-  }
-
-  function decode() {
-    decoded ??= fetch(source.src)
-      .then(response => {
-        if (!response.ok) throw new Error('Bhajan unavailable');
-        return response.arrayBuffer();
-      })
-      .then(bytes => context.decodeAudioData(bytes))
-      .catch(error => { decoded = undefined; throw error; });
-    return decoded;
-  }
-
-  function playNative() {
-    if (document.hidden || choice === 'off' || track || nativePending || pending || !source.paused) return;
-    const id = ++sequence;
-    nativePending = true;
-    source.volume = isCardOpen() ? 1 : .78;
-    display();
-    source.play().then(() => {
-      if (choice === 'off' || document.hidden) source.pause();
-      else if (id === sequence) wantsSound = true;
-    }).catch(() => {}).finally(() => {
-      if (id === sequence) { nativePending = false; display(); }
-    });
-  }
-
-  function activate() {
-    remember('on');
-    if (track || pending || document.hidden) return;
-    try {
-      const Audio = window.AudioContext || window.webkitAudioContext;
-      if (!Audio) { playNative(); return; }
-      if (!context) {
-        context = new Audio();
-        mix = context.createGain();
-        mix.connect(context.destination);
-      }
-      if (!source.paused || nativePending) stop();
-      const id = ++sequence;
-      pending = true;
-      display();
-      Promise.all([context.resume(), decode()]).then(([, buffer]) => {
-        if (id !== sequence || choice === 'off' || document.hidden) return;
-        track = context.createBufferSource();
-        track.buffer = buffer;
-        track.loop = true;
-        gain = context.createGain();
-        startedAt = context.currentTime;
-        gain.gain.value = .001;
-        track.connect(gain).connect(mix);
-        track.start(startedAt, offset % buffer.duration);
-        level();
-      }).catch(() => {
-        if (id !== sequence) return;
-        pending = false;
-        playNative();
-      }).finally(() => {
-        if (id === sequence) { pending = false; display(); }
-      });
-    } catch { playNative(); }
+    generation++;
+    loading = failed = false;
+    end(.08);
+    for (const track of tracks) if (!track.paused) track.pause();
+    show();
   }
 
   function cue(kind) {
-    if (choice === 'off' || !wantsSound || document.hidden || context?.state !== 'running') return;
+    if (preference === 'off' || !active || document.hidden || context?.state !== 'running') return;
     const now = context.currentTime;
-    if (now - lastCue < .51) return;
+    if (now - lastCue < .48) return;
     lastCue = now;
-    const fundamental = { door: 440, sanctum: 587.33, darshan: 523.25, cord: 659.25 }[kind];
-    for (const [i, ratio] of [1, 2.02, 2.73, 4.04].entries()) {
-      const voice = context.createOscillator();
-      const decay = context.createGain();
-      const length = (kind === 'sanctum' ? .9 : .47) - .08 * i;
-      voice.frequency.value = fundamental * ratio;
-      decay.gain.setValueAtTime(.0001, now);
-      decay.gain.exponentialRampToValueAtTime(.053 / (1 + i), now + .021);
-      decay.gain.exponentialRampToValueAtTime(.0001, now + length);
-      voice.connect(decay).connect(mix);
-      voice.start(now);
-      voice.stop(now + length);
-      voice.onended = () => { voice.disconnect(); decay.disconnect(); };
+    const tone = { door: 293.66, sanctum: 392, darshan: 349.23, cord: 523.25 }[kind];
+    for (const [index, multiple] of [1, 1.99, 2.42].entries()) {
+      const note = context.createOscillator();
+      const shape = context.createGain();
+      const length = kind === 'sanctum' ? .77 : .47;
+      note.frequency.value = tone * multiple;
+      shape.gain.setValueAtTime(.0001, now);
+      shape.gain.exponentialRampToValueAtTime(.019 / (index + 1), now + .045);
+      shape.gain.exponentialRampToValueAtTime(.0001, now + length);
+      note.connect(shape).connect(bus);
+      note.start(now);
+      note.stop(now + length);
+      note.onended = () => { note.disconnect(); shape.disconnect(); };
     }
   }
 
+  function usePhase(index, fresh) {
+    phase = index;
+    if (fresh) positions[index] = 0;
+    if (permitted && preference !== 'off') play({ fade: .28, fresh });
+    else if (loading) stop();
+    else show();
+  }
+
   control.addEventListener('click', () => {
-    if (track || !source.paused || pending) { remember('off'); stop(); }
-    else activate();
+    if (active || (loading && permitted)) { remember('off'); stop(); }
+    else { remember('on'); play({ gesture: true }); }
   });
-  for (const event of ['play', 'pause', 'error']) source.addEventListener(event, display);
+  for (const player of tracks) {
+    player.addEventListener('ended', () => {
+      if (active?.native === player) { active = undefined; show(); }
+    });
+  }
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) stop();
-    else if (wantsSound && choice !== 'off') {
-      if (context?.state === 'running') activate();
-      else playNative();
-    }
+    else if (permitted) play();
   });
-  display();
+  show();
   return {
-    prepare() { level(); playNative(); },
-    startCard() { level(); if (wantsSound && !track) playNative(); display(); },
+    prepare() {
+      if (active || permitted) usePhase(0, true);
+      else if (preference !== 'off') { phase = 0; play({ fresh: true }); }
+    },
+    startCard() { usePhase(1, true); },
     cue
   };
 }
