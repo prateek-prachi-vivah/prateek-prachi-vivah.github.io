@@ -248,6 +248,23 @@ for (const [index, event] of wedding.events.entries()) {
 
 const cards = Array.from(carousel.children);
 const currentEvent = document.querySelector('#current-event');
+const schedule = document.querySelector('#schedule');
+const scheduleView = document.querySelector('#schedule-view');
+const swipeHint = schedule.querySelector('.swipe-hint');
+let listView = false;
+scheduleView.addEventListener('click', () => {
+  listView = !listView;
+  schedule.classList.toggle('schedule-list', listView);
+  scheduleView.setAttribute('aria-pressed', String(listView));
+  swipeHint.hidden = listView;
+  if (!listView) {
+    const card = cards[active];
+    carousel.scrollTo({
+      left: card.offsetLeft - (carousel.clientWidth - card.offsetWidth) / 2,
+      behavior: 'instant'
+    });
+  }
+});
 let active = -1;
 let announced = -1;
 let settleTimer;
@@ -278,10 +295,11 @@ selectCard(0);
 announceCard();
 let scheduled = false;
 carousel.addEventListener('scroll', () => {
-  if (scheduled) return;
+  if (scheduled || listView) return;
   scheduled = true;
   requestAnimationFrame(() => {
     scheduled = false;
+    if (listView) return;
     const center = carousel.scrollLeft + carousel.clientWidth / 2;
     const distance = card => Math.abs(card.offsetLeft + card.offsetWidth / 2 - center);
     const closest = cards.reduce((best, card) => distance(card) < distance(best) ? card : best);
@@ -293,6 +311,7 @@ carousel.addEventListener('scroll', () => {
 document.querySelector('#previous-event').addEventListener('click', () => showCard(active - 1));
 document.querySelector('#next-event').addEventListener('click', () => showCard(active + 1));
 carousel.addEventListener('keydown', event => {
+  if (listView) return;
   if (!['ArrowLeft', 'ArrowRight'].includes(event.key)) return;
   event.preventDefault();
   showCard(active + (event.key === 'ArrowRight' ? 1 : -1));
