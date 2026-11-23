@@ -1,4 +1,4 @@
-import { weddingAudio } from './audio.js?v=9';
+import { weddingAudio } from './audio.js?v=10';
 
 const root = document.documentElement;
 const intro = document.querySelector('#top');
@@ -102,6 +102,13 @@ function setFrame(name, image, { inside, gate } = {}) {
     for (const side of ['left', 'right']) {
       const leaf = document.createElement('span');
       leaf.className = 'portal-leaf ' + side;
+      if (side === 'left') {
+        leaf.addEventListener('animationstart', event => {
+          if (event.animationName === 'swing-in' && !opened && leaf.isConnected) {
+            audio.cue(gate === 7 ? 'sanctum' : 'door');
+          }
+        });
+      }
       doors.append(leaf);
     }
     aperture.append(inside, doors);
@@ -109,7 +116,6 @@ function setFrame(name, image, { inside, gate } = {}) {
     layer.append(portal);
     caption.textContent = sceneList.dataset.gateLabel + ' ' + gate + ' / 7';
     intro.setAttribute('aria-label', caption.textContent);
-    audio.cue(gate === 7 ? 'sanctum' : 'door');
   } else {
     layer.append(image);
     caption.textContent = scenes[name].textContent;
@@ -117,7 +123,7 @@ function setFrame(name, image, { inside, gate } = {}) {
   }
   const previous = stage.lastElementChild;
   stage.append(layer);
-  if (previous) setTimeout(() => previous.remove(), 470);
+  if (previous) setTimeout(() => previous.remove(), 320);
 }
 
 async function play() {
@@ -134,13 +140,13 @@ async function play() {
   caption.textContent = scenes.ganesh.textContent;
   intro.setAttribute('aria-label', scenes.ganesh.dataset.description);
   audio.prepare();
-  hardStop = setTimeout(() => reveal({ cinematic: true }), 12500);
+  hardStop = setTimeout(() => reveal({ cinematic: true }), 10500);
   load('entry');
   load('hall');
   load('vishnu');
   // The poster is already visible. Downloads enhance later frames and cannot delay the first one.
   for (let number = 2; number <= 7; number++) load('door-' + number);
-  await wait(1150);
+  await wait(810);
   if (token !== run) return;
   for (let number = 1; number <= 7; number++) {
     const name = number === 1 ? 'entry' : 'door-' + number;
@@ -152,9 +158,8 @@ async function play() {
       setFrame(name, image.cloneNode(), { inside: behind.cloneNode(), gate: number });
     } else {
       caption.textContent = sceneList.dataset.gateLabel + ' ' + number + ' / 7';
-      audio.cue(number === 7 ? 'sanctum' : 'door');
     }
-    await wait(number === 7 ? 1190 : 835);
+    await wait(number === 7 ? 935 : 680);
     if (token !== run) return;
   }
 
@@ -163,7 +168,7 @@ async function play() {
   if (darshan) {
     setFrame('vishnu', darshan.cloneNode());
     audio.cue('darshan');
-    await wait(2100);
+    await wait(1670);
     if (token !== run) return;
   }
   reveal({ cinematic: true, focus: document.activeElement === skip });
