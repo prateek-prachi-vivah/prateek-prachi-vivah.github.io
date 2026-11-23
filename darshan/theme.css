@@ -770,3 +770,29 @@ html:not(.intro-open) .intro.is-dissolving:not([hidden]) {
   }
   .welcome-painting .book-reveal { grid-area: 2 / 1; }
 }
+
+/* Cast brass Om seal with a raised rim and an engraved inner ring. */
+.welcome .welcome-card .seal, footer .seal {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: clamp(2.6rem, 7vh, 3.65rem);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 2px solid #d9ac62;
+  color: #fff1bc;
+  background: radial-gradient(ellipse at 33% 20%, #a65e35, #752f24 58%, #48231c);
+  box-shadow: inset 0 2px 2px #ffe8a3, inset 0 -3px 3px #42261b,
+    0 1px #99652d, 0 2px #885424, 0 3px #74421e, 0 4px #61391c,
+    0 6px 7px #3b1e1e55;
+  text-shadow: 0 1px #865127, 0 2px #512819;
+  transform: perspective(22rem) rotateX(9deg);
+}
+.welcome .welcome-card .seal::after, footer .seal::after {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border: 1px solid #edc67d;
+  border-radius: inherit;
+  pointer-events: none;
+}

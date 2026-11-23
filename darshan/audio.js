@@ -163,6 +163,16 @@ export function weddingAudio({ source, control, hindi, isCardOpen }) {
     }
   }
 
+  // When autoplay is blocked, any ordinary interaction can unlock the current
+  // track. An explicit pause always takes precedence.
+  function resumeOnInteraction(event) {
+    if (!event.isTrusted || control.contains(event.target) || preference === 'off' ||
+        document.hidden || !source.paused || loading) return;
+    play({ gesture: true });
+  }
+  document.addEventListener('click', resumeOnInteraction);
+  document.addEventListener('keydown', resumeOnInteraction);
+
   control.addEventListener('click', () => {
     if (!source.paused || (loading && preference === 'on')) { remember('off'); stop(); }
     else { remember('on'); play({ gesture: true }); }
