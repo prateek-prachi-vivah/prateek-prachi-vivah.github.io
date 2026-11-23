@@ -283,17 +283,6 @@ html[lang="hi"] .cover-copy h2 { line-height:1.12 }
 }
 
 /* A palace doorway opens onto the invitation and its illustrated program. */
-.cover-film {
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  opacity: 0;
-  pointer-events: none;
-}
-.cover-film.is-playing { opacity: .48; }
 .cover-copy { text-shadow: 0 2px 16px #210e1b; }
 .cover-content { position: relative; z-index: 1; }
 .welcome {
@@ -358,11 +347,9 @@ html[lang="hi"] .cover-copy h2 { line-height:1.12 }
   .carousel-nav .dot { min-height: 24px; }
 }
 @media (prefers-reduced-motion: no-preference) {
-  .cover-film { transition: opacity .55s ease; }
   .welcome.arriving .welcome-art { animation: event-art-arrival .7s ease-out both; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .cover-film { display: none; }
 }
 
 .schedule-view {
@@ -405,40 +392,87 @@ html[lang="hi"] .cover-copy h2 { line-height:1.12 }
   .schedule-list .carousel { grid-template-columns: 1fr; }
 }
 
-.trailer-section {
-  padding: clamp(2.5rem, 6vw, 5.5rem) clamp(1rem, 4vw, 3rem);
-  text-align: center;
-  color: #fff4da;
-  background: radial-gradient(ellipse at top, #772b52, #301726 68%);
+/* Jaipur courtyard palette and a single, stationary invitation reveal. */
+:root { --wine:#782f3e; --gold:#8b622f; --paper:#faf0dc; }
+.invite-ready.cover-closed, .invite-ready.cover-opening { overflow-x: clip; overflow-y: auto; }
+.invite-ready.cover-closed .cover {
+  position: relative;
+  inset: auto;
+  z-index: auto;
+  min-height: 100svh;
+  padding: clamp(3.5rem, 9svh, 6rem) 1.25rem 2rem;
+  isolation: isolate;
+  background: #173f37;
 }
-.trailer-section h2 { color: #ffe0a4; margin: 0 0 .45rem; }
-.trailer-section > p { margin: 0 0 1.1rem; }
-.trailer-section video {
+.invite-ready.cover-closed main, .invite-ready.cover-closed footer { display: none; }
+.cover::before {
+  background: radial-gradient(ellipse at 80% 45%, #2d6352, transparent 65%),
+    repeating-linear-gradient(45deg, #f7d89d09 0 1px, transparent 1px 15px);
+}
+.cover::after {
+  inset: .7rem;
+  border: 1px solid #e6bd75;
+  border-radius: 1rem;
+  box-shadow: inset 0 0 0 3px #1d473c, inset 0 0 0 4px #e6bd7566;
+}
+.cover .cover-content {
+  width: min(100%, 63rem);
+  grid-template-columns: minmax(0,1.15fr) minmax(0,1fr);
+  grid-template-rows: 1fr auto 1fr;
+  gap: 1.4rem clamp(1rem,5vw,4rem);
+  align-items: center;
+  animation: none;
+}
+.opening-arch {
+  grid-area: 1 / 1 / 4 / 2;
+  width: min(100%, 29rem);
+  margin: 0;
+  padding: .4rem;
+  border: 3px double #e4b672;
+  border-radius: 48% 48% .6rem .6rem / 28% 28% .6rem .6rem;
+  background: #f3deae;
+}
+.opening-arch img {
   display: block;
-  width: min(100%, 45rem);
+  width: 100%;
   height: auto;
-  margin: 0 auto;
-  border: 3px double #d9ac6a;
-  border-radius: .65rem;
-  background: #22151b;
+  aspect-ratio: 4/5;
+  object-fit: cover;
+  border-radius: inherit;
 }
-.trailer-chapters {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: .45rem;
-  max-width: 49rem;
-  margin: 1rem auto 0;
-}
-.trailer-chapter {
-  min-height: 44px;
-  padding: .45rem .75rem;
-  border: 1px solid #c59165;
-  border-radius: 1.5rem;
-  background: #412538;
-  color: #fff4da;
+.cover .cover-copy { grid-area: 2 / 2; text-align: center; text-shadow: none; }
+.cover .cover-copy h2 { font-size: clamp(2.9rem,7vw,5.3rem); line-height: 1.02; }
+.opening-button {
+  grid-area: 3 / 2;
+  align-self: start;
+  min-height: 48px;
+  padding: .75rem 1.45rem;
+  border-radius: 2rem;
+  border: 1px solid #ffe0a2;
+  background: #f0ce94;
+  color: #282319;
   font: inherit;
+  font-weight: 700;
   cursor: pointer;
 }
-.trailer-chapter[aria-current="true"] { background: #ffe0a4; color: #391a2c; }
-.trailer-chapter:focus-visible { outline: 2px solid #ffe0a4; outline-offset: 3px; }
+.opening-button:focus-visible { outline: 2px solid #ffe0a2; outline-offset: .3rem; }
+.cover-opening .cover { animation: stationery-fade .24s ease-out both; }
+@keyframes stationery-fade { to { opacity: 0; } }
+.welcome { background: #f7ebd5; }
+.welcome-card { background: #fffaec; border-color: #a47d4d; }
+.welcome-art { border-color: #7a9477; }
+.schedule { background: linear-gradient(#e7ebdb, #f9efdc 58%); }
+.venues { background: #faf0dc; }
+.venue-photo-caption { background: #244e42; }
+footer { background: #173f37; }
+@media (max-width: 690px) {
+  .cover .cover-content { grid-template-columns: minmax(0,1fr); grid-template-rows: auto; gap: .8rem; }
+  .cover .cover-copy, .opening-button, .opening-arch { grid-area: auto; }
+  .cover .cover-copy { width: 100%; }
+  .cover .cover-copy h2 { font-size: clamp(2.2rem,10vw,4.3rem); }
+  .opening-arch { width: min(74vw,14rem); }
+  .opening-arch img { aspect-ratio: 5/4; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cover-opening .cover { animation: none; }
+}

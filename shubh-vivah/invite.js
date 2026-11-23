@@ -54,11 +54,9 @@ function scatter(container) {
 }
 
 const root = document.documentElement;
-const book = document.querySelector('#open-book');
+const openingButton = document.querySelector('#cover-hint');
 const welcome = document.querySelector('#welcome');
 const content = [document.querySelector('main'), document.querySelector('footer')];
-const coverFilm = document.querySelector('#cover-film');
-coverFilm.addEventListener('playing', () => coverFilm.classList.add('is-playing'));
 let visitRecorded = false;
 function recordCardOpen() {
   if (visitRecorded || navigator.globalPrivacyControl || navigator.doNotTrack === '1') return;
@@ -72,11 +70,6 @@ let opening = false;
 function closeCover() {
   for (const element of content) element.inert = true;
   root.classList.add('cover-closed');
-  if (!motion.matches && !navigator.connection?.saveData) {
-    if (!coverFilm.hasAttribute('src')) coverFilm.src = '/shubh-vivah/photos/haveli-opening.mp4';
-    coverFilm.currentTime = 0;
-    coverFilm.play().catch(() => {});
-  }
   window.scrollTo({ top: 0, behavior: 'instant' });
 }
 
@@ -84,20 +77,19 @@ function openCover({ animate = true, focus = true } = {}) {
   if (opening || !root.classList.contains('cover-closed')) return;
   recordCardOpen();
   if (focus && music.paused) startBhajan();
-  if (focus) welcome.classList.add('arriving');
   const finish = () => {
     root.classList.remove('cover-closed', 'cover-opening');
     opening = false;
-    coverFilm.pause();
     for (const element of content) element.inert = false;
+    if (focus && !motion.matches) {
+      welcome.animate([{ opacity: .65 }, { opacity: 1 }], { duration: 330, easing: 'ease-out' });
+    }
     if (focus) document.querySelector('#welcome-names').focus({ preventScroll: true });
-    setTimeout(() => welcome.classList.remove('arriving'), 700);
   };
   if (animate && !motion.matches) {
     opening = true;
     root.classList.add('cover-opening');
-    scatter(document.querySelector('#cover-petals'));
-    setTimeout(finish, 1040);
+    setTimeout(finish, 240);
   } else {
     finish();
   }
@@ -106,8 +98,7 @@ function openCover({ animate = true, focus = true } = {}) {
 root.classList.add('invite-ready');
 if (!location.hash || location.hash === '#top') closeCover();
 else recordCardOpen();
-book.addEventListener('click', () => openCover());
-document.querySelector('#cover-hint').addEventListener('click', () => openCover());
+openingButton.addEventListener('click', () => openCover());
 document.querySelector('.skip').addEventListener('click', () =>
   openCover({ animate: false, focus: false })
 );
@@ -115,7 +106,7 @@ document.querySelector('#replay-invitation').addEventListener('click', event => 
   event.preventDefault();
   history.replaceState(null, '', location.pathname + location.search);
   closeCover();
-  book.focus({ preventScroll: true });
+  openingButton.focus({ preventScroll: true });
 });
 
 const weddingDate = dateFrom(wedding.date);
@@ -398,31 +389,6 @@ for (const venue of wedding.venues) {
 }
 
 const music = document.querySelector('#wedding-music');
-const trailer = document.querySelector('#trailer-player');
-const chapters = document.querySelector('#trailer-chapters');
-const chapterDuration = 3;
-for (const [index, event] of wedding.events.entries()) {
-  const chapter = create('button', 'trailer-chapter', event.title);
-  chapter.type = 'button';
-  chapter.addEventListener('click', () => {
-    trailer.currentTime = index * chapterDuration;
-    trailer.play().catch(() => {});
-  });
-  chapters.append(chapter);
-}
-function syncTrailerChapter() {
-  const index = Math.min(wedding.events.length - 1, Math.floor(trailer.currentTime / chapterDuration));
-  for (const [position, chapter] of Array.from(chapters.children).entries()) {
-    chapter.setAttribute('aria-current', String(!trailer.paused && position === index));
-  }
-}
-trailer.addEventListener('play', () => {
-  music.pause();
-  syncTrailerChapter();
-});
-for (const event of ['timeupdate', 'pause', 'ended']) {
-  trailer.addEventListener(event, syncTrailerChapter);
-}
 const musicToggle = document.querySelector('#sound-toggle');
 function updateMusicButton() {
   musicToggle.setAttribute('aria-pressed', String(!music.paused));
@@ -434,7 +400,6 @@ music.addEventListener('play', updateMusicButton);
 music.addEventListener('pause', updateMusicButton);
 music.addEventListener('ended', updateMusicButton);
 function startBhajan() {
-  trailer.pause();
   music.play().catch(updateMusicButton);
 }
 musicToggle.addEventListener('click', () => {
