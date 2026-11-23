@@ -1,12 +1,9 @@
 const preferenceKey = 'wedding-audio-v2';
+const transition = .16;
+const tones = { door: 293.66, sanctum: 392, darshan: 349.23, cord: 523.25 };
 
-/** A single transport keeps the Vaikuntha score and Ganesh bhajan from overlapping. */
 export function weddingAudio({ source, control, hindi, isCardOpen }) {
   const tracks = [source.src, new URL(source.dataset.cardSrc, document.baseURI).href];
-  source.preload = 'auto';
-  const levels = [.78, 2.05];
-  const positions = [0, 0];
-  const buffers = [];
   const labels = hindi ? {
     play: ['वैकुंठ संगीत सुनें', 'गणेश भजन सुनें'],
     pause: 'ध्वनि बंद करें', waiting: 'संगीत लोड हो रहा है', retry: 'संगीत फिर चलाएँ'
@@ -14,20 +11,18 @@ export function weddingAudio({ source, control, hindi, isCardOpen }) {
     play: ['Play Vaikuntha music', 'Play Ganesh bhajan'],
     pause: 'Mute sound', waiting: 'Loading sound', retry: 'Retry sound'
   };
-
   let preference;
   try { preference = sessionStorage.getItem(preferenceKey); } catch {}
-  let context, bus;
-  let active;
   let phase = Number(isCardOpen());
-  if (!phase && !source.paused) active = { native: source, phase };
+  let playingPhase = !phase && !source.paused ? 0 : null;
+  let context, music, chimes;
+  const liveChimes = new Set();
   let generation = 0;
   let loading = false;
   let failed = false;
-  let lastCue = -1;
 
   function show() {
-    const playing = Boolean(active && (!active.native || !active.native.paused));
+    const playing = !source.paused && playingPhase === phase;
     control.dataset.track = phase ? 'ganesh' : 'vaikuntha';
     control.dataset.status = playing ? 'playing' : loading ? 'loading' : failed ? 'retry' : 'paused';
     control.setAttribute('aria-pressed', String(playing));
@@ -39,108 +34,91 @@ export function weddingAudio({ source, control, hindi, isCardOpen }) {
     try { sessionStorage.setItem(preferenceKey, value); } catch {}
   }
 
-  function load(index) {
-    buffers[index] ??= fetch(tracks[index])
-      .then(response => {
-        if (!response.ok) throw new Error('Unable to load soundtrack');
-        return response.arrayBuffer();
-      })
-      .then(bytes => context.decodeAudioData(bytes))
-      .catch(error => { buffers[index] = undefined; throw error; });
-    return buffers[index];
+  // Keep the same authorized HTML audio element for both tracks. Attach the mixer
+  // only after its context runs so a suspended context cannot silence native playback.
+  function enableMixer() {
+    const Audio = window.AudioContext || window.webkitAudioContext;
+    if (!Audio) return;
+    try {
+      context ??= new Audio();
+      const attach = () => {
+        if (music || context.state !== 'running') return;
+        const input = context.createMediaElementSource(source);
+        music = context.createGain();
+        chimes = context.createGain();
+        input.connect(music).connect(context.destination);
+        chimes.connect(context.destination);
+      };
+      if (context.state === 'running') attach();
+      else context.resume().then(attach).catch(() => {});
+    } catch {}
   }
 
-  function end(fade = 0) {
-    const old = active;
-    active = undefined;
-    if (!old) return Promise.resolve();
-    if (old.native) {
-      positions[old.phase] = old.native.currentTime || 0;
-      // iOS can ignore programmatic media volume. Pause before changing tracks.
-      old.native.pause();
-      return Promise.resolve();
-    }
+  function setGain(value, duration = transition) {
+    if (!music) return;
     const now = context.currentTime;
-    positions[old.phase] = (positions[old.phase] + now - old.start) % old.node.buffer.duration;
-    old.gain.gain.cancelScheduledValues(now);
-    old.gain.gain.setTargetAtTime(0, now, Math.max(.008, fade / 5));
-    old.node.stop(now + Math.max(.045, fade));
-    old.node.onended = () => { old.node.disconnect(); old.gain.disconnect(); };
-    return fade ? new Promise(resolve => setTimeout(resolve, fade * 1000 + 20)) : Promise.resolve();
+    music.gain.cancelScheduledValues(now);
+    music.gain.setValueAtTime(music.gain.value, now);
+    music.gain.linearRampToValueAtTime(value, now + duration);
   }
 
-  function startNative(token, index) {
-    const player = source;
-    if (player.src !== tracks[index]) player.src = tracks[index];
-    player.loop = true;
-    player.volume = index ? 1 : .75;
-    try { player.currentTime = positions[index]; } catch {}
-    return player.play().then(() => {
-      if (token !== generation || preference === 'off' || document.hidden) return;
-      active = { native: player, phase: index };
+  function nativeRamp(from, to, token) {
+    const start = performance.now();
+    return new Promise(resolve => {
+      function step(now) {
+        if (token !== generation) { resolve(); return; }
+        const progress = Math.max(0, Math.min(1, (now - start) / (transition * 1000)));
+        source.volume = from + (to - from) * progress;
+        if (progress < 1) requestAnimationFrame(step);
+        else resolve();
+      }
+      requestAnimationFrame(step);
     });
   }
 
-  async function play({ gesture = false, fade = 0, fresh = false } = {}) {
+  async function play({ gesture = false, fresh = false } = {}) {
     if (preference === 'off' || document.hidden) return;
     const token = ++generation;
     const index = phase;
-    const nativeTransport = Boolean(active?.native);
+    const changing = source.src !== tracks[index] && !source.paused;
     loading = true;
     failed = false;
     show();
-
-    let unlocked;
-    if (gesture) {
-      try {
-        const Audio = window.AudioContext || window.webkitAudioContext;
-        if (Audio && !context) {
-          context = new Audio();
-          bus = context.createGain();
-          bus.connect(context.destination);
-        }
-        if (context) unlocked = context.resume().catch(() => {});
-      } catch {}
-    }
-
+    if (gesture) enableMixer();
     try {
-      // Use the loaded media directly inside the sound control handler. Keep that same element
-      // authorized for the bhajan on browsers with per-element autoplay rules.
-      if (gesture && !active) {
-        await startNative(token, index);
-        return;
-      }
-      await end(fade);
-      if (token !== generation || document.hidden || preference === 'off') return;
-      if (fresh) positions[index] = 0;
-      if (unlocked) await unlocked;
-      if (!nativeTransport && context?.state === 'running') {
-        if (index === 0) load(1).catch(() => {});
-        let buffer;
-        try { buffer = await load(index); } catch {}
-        if (token !== generation || document.hidden || preference === 'off') return;
-        if (buffer) {
-          const node = context.createBufferSource();
-          const gain = context.createGain();
-          const start = context.currentTime;
-          node.buffer = buffer;
-          node.loop = true;
-          gain.gain.setValueAtTime(.001, start);
-          gain.gain.linearRampToValueAtTime(levels[index], start + .46);
-          node.connect(gain).connect(bus);
-          node.start(start, positions[index] % buffer.duration);
-          active = { node, gain, start, phase: index };
-          node.onended = () => {
-            if (active?.node === node) { active = undefined; positions[index] = 0; show(); }
-            node.disconnect();
-            gain.disconnect();
-          };
-          return;
+      if (changing) {
+        if (music && context.state === 'running') {
+          setGain(0);
+          await new Promise(resolve => setTimeout(resolve, transition * 1000));
+        } else {
+          // Some mobile browsers ignore element volume. Both files still have
+          // matched source levels, and the authorized element is reused.
+          source.volume = .98;
+          if (source.volume === .98) await nativeRamp(.98, 0, token);
         }
+        if (token !== generation || preference === 'off' || document.hidden) return;
+        source.pause();
       }
-      await startNative(token, index);
-    } catch {
-      if (token === generation) failed = gesture;
+      if (source.src !== tracks[index]) source.src = tracks[index];
+      if (fresh) {
+        try { source.currentTime = 0; } catch {}
+      }
+      if (music) setGain(changing ? 0 : 1, .01);
+      source.loop = true;
+      // Directly within the button handler when browser activation is required.
+      await source.play();
+      if (token !== generation || preference === 'off' || document.hidden) return;
+      playingPhase = index;
+      if (changing && !music && source.volume < .95) nativeRamp(source.volume, 1, token);
+      else source.volume = 1;
+      if (music) setGain(1);
+      if (!gesture) enableMixer();
+    } catch (error) {
+      if (token === generation) {
+        failed = error?.name !== 'NotAllowedError';
+        source.volume = 1;
+        setGain(1, .01);
+      }
     } finally {
       if (token === generation) { loading = false; show(); }
     }
@@ -149,45 +127,46 @@ export function weddingAudio({ source, control, hindi, isCardOpen }) {
   function stop() {
     generation++;
     loading = failed = false;
-    end(.08);
+    playingPhase = null;
+    for (const note of liveChimes) {
+      try { note.stop(); } catch {}
+    }
     source.pause();
+    source.volume = 1;
+    setGain(1, .01);
     show();
   }
 
   function cue(kind) {
-    if (preference === 'off' || !active || document.hidden || context?.state !== 'running') return;
+    if (preference === 'off' || source.paused || document.hidden ||
+        !chimes || context.state !== 'running') return;
     const now = context.currentTime;
-    if (now - lastCue < .48) return;
-    lastCue = now;
-    const tone = { door: 293.66, sanctum: 392, darshan: 349.23, cord: 523.25 }[kind];
+    const length = kind === 'sanctum' ? .64 : .39;
+    const tone = tones[kind];
+    if (playingPhase === 0) {
+      setGain(.62, .012);
+      music.gain.setValueAtTime(.62, now + .07);
+      music.gain.linearRampToValueAtTime(1, now + .20);
+    }
     for (const [index, multiple] of [1, 1.99, 2.42].entries()) {
       const note = context.createOscillator();
-      const shape = context.createGain();
-      const length = kind === 'sanctum' ? .77 : .47;
+      const envelope = context.createGain();
       note.frequency.value = tone * multiple;
-      shape.gain.setValueAtTime(.0001, now);
-      shape.gain.exponentialRampToValueAtTime(.019 / (index + 1), now + .045);
-      shape.gain.exponentialRampToValueAtTime(.0001, now + length);
-      note.connect(shape).connect(bus);
+      envelope.gain.setValueAtTime(.0001, now);
+      envelope.gain.exponentialRampToValueAtTime(.064 / (index + 1), now + .009);
+      envelope.gain.exponentialRampToValueAtTime(.0001, now + length);
+      note.connect(envelope).connect(chimes);
+      liveChimes.add(note);
+      note.onended = () => { liveChimes.delete(note); note.disconnect(); envelope.disconnect(); };
       note.start(now);
       note.stop(now + length);
-      note.onended = () => { note.disconnect(); shape.disconnect(); };
     }
   }
 
-  function usePhase(index, fresh) {
-    phase = index;
-    if (fresh) positions[index] = 0;
-    if (preference !== 'off') play({ fade: .28, fresh });
-    else if (loading) stop();
-    else show();
-  }
-
   control.addEventListener('click', () => {
-    if (active || (loading && preference === 'on')) { remember('off'); stop(); }
+    if (!source.paused || (loading && preference === 'on')) { remember('off'); stop(); }
     else { remember('on'); play({ gesture: true }); }
   });
-
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) stop();
     else play();
@@ -195,10 +174,16 @@ export function weddingAudio({ source, control, hindi, isCardOpen }) {
   show();
   return {
     prepare() {
-      if (phase === 0 && active?.native === source && !source.paused) return;
-      usePhase(0, true);
+      phase = 0;
+      if (preference !== 'off' && playingPhase === 0 && !source.paused) enableMixer();
+      else play({ fresh: true });
+      show();
     },
-    startCard() { usePhase(1, true); },
+    startCard() {
+      phase = 1;
+      play({ fresh: true });
+      show();
+    },
     cue
   };
 }
