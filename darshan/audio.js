@@ -20,6 +20,7 @@ export function weddingAudio({ source, control, hindi, isCardOpen }) {
   let context, bus;
   let active;
   let phase = Number(isCardOpen());
+  if (!phase && !source.paused) active = { native: source, phase };
   let generation = 0;
   let loading = false;
   let failed = false;
@@ -193,7 +194,10 @@ export function weddingAudio({ source, control, hindi, isCardOpen }) {
   });
   show();
   return {
-    prepare() { usePhase(0, true); },
+    prepare() {
+      if (phase === 0 && active?.native === source && !source.paused) return;
+      usePhase(0, true);
+    },
     startCard() { usePhase(1, true); },
     cue
   };
