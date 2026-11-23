@@ -2,7 +2,7 @@ const preferenceKey = 'wedding-audio-v2';
 
 /** A single transport keeps the Vaikuntha score and Ganesh bhajan from overlapping. */
 export function weddingAudio({ source, control, hindi, isCardOpen }) {
-  const tracks = [new URL('./vaikuntha-flute.mp3', import.meta.url).href, source.src];
+  const tracks = [source.src, new URL(source.dataset.cardSrc, document.baseURI).href];
   source.preload = 'auto';
   const levels = [.78, 2.05];
   const positions = [0, 0];
@@ -25,6 +25,7 @@ export function weddingAudio({ source, control, hindi, isCardOpen }) {
   let failed = false;
   let permitted = preference === 'on';
   let lastCue = -1;
+  let startingFromGesture = false;
 
   function show() {
     const playing = Boolean(active && (!active.native || !active.native.paused));
@@ -87,6 +88,7 @@ export function weddingAudio({ source, control, hindi, isCardOpen }) {
     if (preference === 'off' || document.hidden) return;
     const token = ++generation;
     const index = phase;
+    const nativeTransport = Boolean(active?.native);
     loading = true;
     failed = false;
     show();
@@ -105,8 +107,10 @@ export function weddingAudio({ source, control, hindi, isCardOpen }) {
     }
 
     try {
-      // Call native play directly from the sound button when there is no Web Audio route.
-      if (!context && !active && gesture) {
+      // Use the loaded media directly inside the first tap. Keep that same element
+      // authorized for the bhajan on browsers with per-element autoplay rules.
+      if (gesture && !active) {
+        startingFromGesture = true;
         await startNative(token, index);
         return;
       }
@@ -114,7 +118,7 @@ export function weddingAudio({ source, control, hindi, isCardOpen }) {
       if (token !== generation || document.hidden || preference === 'off') return;
       if (fresh) positions[index] = 0;
       if (unlocked) await unlocked;
-      if (context?.state === 'running') {
+      if (!nativeTransport && context?.state === 'running') {
         if (index === 0) load(1).catch(() => {});
         let buffer;
         try { buffer = await load(index); } catch {}
@@ -143,6 +147,7 @@ export function weddingAudio({ source, control, hindi, isCardOpen }) {
     } catch {
       if (token === generation) failed = gesture;
     } finally {
+      if (gesture) startingFromGesture = false;
       if (token === generation) { loading = false; show(); }
     }
   }
@@ -193,16 +198,19 @@ export function weddingAudio({ source, control, hindi, isCardOpen }) {
     if (document.hidden) stop();
     else if (permitted) play();
   });
-  document.addEventListener('click', event => {
-    if (event.target.closest('#sound-toggle') || preference === 'off' || (active && !active.native)) return;
+  function activateOnInteraction(event) {
+    if (!event.isTrusted || event.target.closest?.('#sound-toggle') ||
+        preference === 'off' || active || startingFromGesture) return;
     play({ gesture: true });
-  }, { capture: true });
+  }
+  // Touch activation arrives at pointer-up, before the compatibility click.
+  document.addEventListener('pointerup', event => {
+    if (event.pointerType !== 'mouse') activateOnInteraction(event);
+  }, { capture: true, passive: true });
+  document.addEventListener('click', activateOnInteraction, { capture: true });
   show();
   return {
-    prepare() {
-      if (active || permitted) usePhase(0, true);
-      else if (preference !== 'off') { phase = 0; play({ fresh: true }); }
-    },
+    prepare() { usePhase(0, true); },
     startCard() { usePhase(1, true); },
     cue
   };
