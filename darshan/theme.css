@@ -719,3 +719,54 @@ html:not(.intro-open) .intro.is-dissolving:not([hidden]) {
 @media (prefers-reduced-motion: reduce) {
   .welcome.scene.book-opening .welcome-card::after { animation: none; }
 }
+
+/* Keep the painting readable while the hinged invitation opens in front of it. */
+.welcome.scene.welcome-painting {
+  background: radial-gradient(ellipse at 64% 14%, #8e5141, #582d3a 54%, #301c2b 100%);
+}
+.welcome-painting .welcome-veil {
+  background: linear-gradient(90deg, #301a28e8 0%, #4c273ac7 30%, #4c273a22 58%, transparent 77%),
+    linear-gradient(0deg, #301a28b5, transparent 26%);
+}
+.welcome.scene.welcome-painting .welcome-art img { object-position: 70% 43%; }
+.welcome-painting .book-page-edge {
+  background: repeating-linear-gradient(180deg, #c89b6a 0 1px, #e8cda0 1px 3px);
+}
+.welcome-painting .book-front { box-shadow: inset 9px 0 14px #1d0f1d90, inset 0 0 0 3px #bd8d56; }
+@media (min-width: 900px) {
+  .welcome.scene.welcome-painting {
+    grid-template-columns: minmax(0, 46%) minmax(0, 54%);
+    justify-items: start;
+    padding-inline: clamp(1.5rem, 4.75vw, 5rem);
+  }
+  .welcome-painting .book-reveal { width: min(100%, 32.5rem); }
+}
+@media (max-width: 899px) {
+  .welcome.scene.welcome-painting {
+    grid-template-rows: auto auto;
+    gap: clamp(.65rem, 2.7vw, 1.35rem);
+    min-height: auto;
+    padding-inline: clamp(.72rem, 4vw, 2.8rem);
+  }
+  .welcome-painting .welcome-veil {
+    background: radial-gradient(ellipse at 50% 0%, #bd81502e, transparent 68%);
+  }
+  .welcome.scene.welcome-painting .welcome-art {
+    grid-area: 1 / 1;
+    position: relative;
+    inset: auto;
+    z-index: 0;
+    width: min(100%, 42rem);
+    height: auto;
+    margin: 0;
+    border: 1px solid #d6ab74;
+    border-radius: .85rem .85rem .35rem .35rem;
+    overflow: hidden;
+    box-shadow: 0 10px 25px #2e1928a0;
+  }
+  .welcome.scene.welcome-painting .welcome-art img {
+    height: auto;
+    aspect-ratio: 3 / 2;
+  }
+  .welcome-painting .book-reveal { grid-area: 2 / 1; }
+}
