@@ -540,3 +540,73 @@ footer { background: #4d1427; }
   box-shadow: 0 .45rem 1.25rem #5a203115;
 }
 footer { background: #4d1427; }
+
+.invite-tools {
+  position: relative;
+  inset: auto;
+  flex-wrap: wrap;
+  padding: .55rem max(1rem, env(safe-area-inset-right));
+  border-bottom: 1px solid #b88d58;
+  background: #4d1427;
+}
+.invite-tools a, .invite-tools button { white-space: normal; text-align: center; }
+.invite-ready.cover-closed .cover {
+  min-height: calc(100svh - 64px);
+  padding-top: clamp(1.4rem, 5svh, 3.25rem);
+}
+.opening-arch {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  perspective: 56rem;
+}
+.opening-door {
+  position: absolute;
+  inset: .42rem auto .42rem .42rem;
+  width: calc(50% - .42rem);
+  border: 1px solid #e0b36a;
+  background:
+    repeating-linear-gradient(45deg, transparent 0 10px, #f3cc8024 10px 11px),
+    repeating-linear-gradient(-45deg, transparent 0 10px, #f3cc8024 10px 11px),
+    linear-gradient(90deg, #3a1022, #782e42, #471427);
+  box-shadow: inset 0 0 0 .28rem #52182a, inset 0 0 0 .35rem #c39151;
+  transform-origin: left center;
+  backface-visibility: hidden;
+  pointer-events: none;
+}
+.door-right { inset-inline: auto .42rem; transform-origin: right center; }
+.opening-door::after {
+  content: '❦';
+  position: absolute;
+  top: 57%;
+  right: .55rem;
+  color: #f6d294;
+  font-size: clamp(1.15rem, 4vw, 2.4rem);
+  text-shadow: 0 0 .75rem #f6d29480;
+}
+.door-right::after { right: auto; left: .55rem; }
+.cover-opening .cover { animation: invitation-door-fade .85s ease-in-out both; }
+.cover-opening .door-left { animation: invitation-door-left .73s cubic-bezier(.22,.7,.22,1) both; }
+.cover-opening .door-right { animation: invitation-door-right .73s cubic-bezier(.22,.7,.22,1) both; }
+@keyframes invitation-door-left { to { transform: rotateY(-89deg); } }
+@keyframes invitation-door-right { to { transform: rotateY(89deg); } }
+@keyframes invitation-door-fade { 73% { opacity: 1; } to { opacity: 0; } }
+.welcome-art figcaption {
+  position: absolute;
+  inset: 27% 16% auto;
+  display: grid;
+  gap: .25rem;
+  justify-items: center;
+  border: 3px double #af7b42;
+  background: #fff4dbe8;
+  color: #611a32;
+  padding: clamp(.55rem, 2.7vw, 1.5rem) .45rem;
+  text-wrap: balance;
+  box-shadow: 0 .4rem 1.1rem #683a3329;
+}
+.welcome-art figcaption strong { font: 700 clamp(1.22rem, 3.6vw, 2.6rem)/1.14 var(--serif); }
+.welcome-art figcaption time { font-size: clamp(.73rem, 2.2vw, 1rem); }
+.haveli-ornament { color: #986b38; font-size: 1.15rem; }
+@media (prefers-reduced-motion: reduce) {
+  .cover-opening .cover, .cover-opening .opening-door { animation: none; }
+}

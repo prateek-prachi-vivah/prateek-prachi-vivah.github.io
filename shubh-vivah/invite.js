@@ -67,6 +67,32 @@ function recordCardOpen() {
 }
 let opening = false;
 
+function playOpeningChime() {
+  const AudioContext = window.AudioContext || window.webkitAudioContext;
+  if (!AudioContext) return;
+  try {
+    const context = new AudioContext();
+    const now = context.currentTime;
+    for (const [index, frequency] of [520, 782, 1046].entries()) {
+      const tone = context.createOscillator();
+      const gain = context.createGain();
+      const start = now + index * .095;
+      tone.type = 'sine';
+      tone.frequency.value = frequency;
+      gain.gain.setValueAtTime(.001, start);
+      gain.gain.exponentialRampToValueAtTime(.07, start + .016);
+      gain.gain.exponentialRampToValueAtTime(.001, start + .47);
+      tone.connect(gain).connect(context.destination);
+      tone.start(start);
+      tone.stop(start + .48);
+      if (index === 2) tone.addEventListener('ended', () => context.close().catch(() => {}));
+    }
+    context.resume().catch(() => context.close().catch(() => {}));
+  } catch {
+    // A blocked sound effect must never prevent the invitation from opening.
+  }
+}
+
 function closeCover() {
   for (const element of content) element.inert = true;
   root.classList.add('cover-closed');
@@ -76,7 +102,10 @@ function closeCover() {
 function openCover({ animate = true, focus = true } = {}) {
   if (opening || !root.classList.contains('cover-closed')) return;
   recordCardOpen();
-  if (focus && music.paused) startBhajan();
+  if (focus && !soundOff) {
+    playOpeningChime();
+    if (music.paused) startBhajan();
+  }
   const finish = () => {
     root.classList.remove('cover-closed', 'cover-opening');
     opening = false;
@@ -89,7 +118,7 @@ function openCover({ animate = true, focus = true } = {}) {
   if (animate && !motion.matches) {
     opening = true;
     root.classList.add('cover-opening');
-    setTimeout(finish, 240);
+    setTimeout(finish, 850);
   } else {
     finish();
   }
@@ -390,6 +419,7 @@ for (const venue of wedding.venues) {
 
 const music = document.querySelector('#wedding-music');
 const musicToggle = document.querySelector('#sound-toggle');
+let soundOff = false;
 function updateMusicButton() {
   musicToggle.setAttribute('aria-pressed', String(!music.paused));
   musicToggle.textContent = music.paused
@@ -403,6 +433,7 @@ function startBhajan() {
   music.play().catch(updateMusicButton);
 }
 musicToggle.addEventListener('click', () => {
+  soundOff = !music.paused;
   if (music.paused) {
     startBhajan();
   } else {
