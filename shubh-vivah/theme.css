@@ -141,11 +141,11 @@ html[lang="hi"] .cover-copy h2 { line-height:1.12 }
 }
 
 .cover::before {
-  background: linear-gradient(125deg, #49142ee6 7%, #70184760 52%, #0a403cd9 100%),
+  background: linear-gradient(125deg, #49142ee6 7%, #70184760 52%, #532137d9 100%),
     url('/shubh-vivah/photos/haveli-entrance.webp') center 50% / cover;
 }
 .book-front {
-  background: linear-gradient(180deg, #16484015 15%, #5d143a20 45%, #751b45ec 76%, #431126 100%),
+  background: linear-gradient(180deg, #692e4415 15%, #5d143a20 45%, #751b45ec 76%, #431126 100%),
     url('/rajputana/palace.webp') center 41% / cover;
 }
 .cover-copy h2 { color: #fff3d8; text-shadow: 0 .1em .36em #341222b3; }
@@ -163,7 +163,7 @@ html[lang="hi"] .cover-copy h2 { line-height:1.12 }
 }
 .event-art { align-self: stretch; object-fit: cover; }
 .venues { background: #fff3df; }
-.venue-photo-caption { background: linear-gradient(105deg, #7a204d, #52304b 65%, #174d43); }
+.venue-photo-caption { background: linear-gradient(105deg, #7a204d, #52304b 65%, #552339); }
 
 .cover::after { border-radius: 48% 48% 1rem 1rem / 10% 10% 1rem 1rem; }
 .cover-kicker { letter-spacing: .13em; }
@@ -174,14 +174,14 @@ html[lang="hi"] .cover-copy h2 { line-height:1.12 }
 }
 .scroll .date-paper {
   background: radial-gradient(ellipse at top left, #f5c9b4, transparent 56%),
-    radial-gradient(ellipse at bottom right, #cfe2cb, transparent 58%), #fff4d9;
+    radial-gradient(ellipse at bottom right, #ead1b4, transparent 58%), #fff4d9;
 }
 .scroll .paper-frame {
   border: 3px double #9a5b36;
   color: #642239;
 }
 .scroll .paper-frame .day { color: #7c214c; text-shadow: 0 2px #eed0a0; }
-.scroll .paper-frame .month { color: #245346; }
+.scroll .paper-frame .month { color: #742d43; }
 .scroll .tassel { height: 78px; touch-action: none; }
 .scroll .tassel-art {
   width: 5px;
@@ -261,13 +261,13 @@ html[lang="hi"] .cover-copy h2 { line-height:1.12 }
 .welcome-card { border: 3px double #9e6a43; box-shadow: 0 1rem 2.5rem #411b3840; }
 .schedule {
   background: radial-gradient(ellipse at top left, #f2c5d6, transparent 52%),
-    radial-gradient(ellipse at top right, #c7e4d4, transparent 55%), #fff6e5;
+    radial-gradient(ellipse at top right, #edd6be, transparent 55%), #fff6e5;
 }
 .event-card { border: 1px solid #c99e67; border-top: 4px solid var(--event-accent, #812550); }
 .event-body { background: linear-gradient(155deg, #fff2d8 0%, #fffaf1 70%); }
 .event-art { align-self: start; height: auto; object-fit: contain; }
 .venue-photo-frame { border: 3px double #b68551; }
-.venue-photo-caption { background: linear-gradient(110deg, #7a244d, #35463e 80%); }
+.venue-photo-caption { background: linear-gradient(110deg, #7a244d, #481728 80%); }
 @media (prefers-reduced-motion: no-preference) {
   .cover-closed .cover-copy { animation: cover-copy-arrival .7s ease-out both; }
   .carousel { scroll-behavior: smooth; }
@@ -392,7 +392,7 @@ html[lang="hi"] .cover-copy h2 { line-height:1.12 }
   .schedule-list .carousel { grid-template-columns: 1fr; }
 }
 
-/* Jaipur courtyard palette and a single, stationary invitation reveal. */
+/* Maroon lacquer and ivory stationery with a stationary reveal. */
 :root { --wine:#782f3e; --gold:#8b622f; --paper:#faf0dc; }
 .invite-ready.cover-closed, .invite-ready.cover-opening { overflow-x: clip; overflow-y: auto; }
 .invite-ready.cover-closed .cover {
@@ -402,18 +402,18 @@ html[lang="hi"] .cover-copy h2 { line-height:1.12 }
   min-height: 100svh;
   padding: clamp(3.5rem, 9svh, 6rem) 1.25rem 2rem;
   isolation: isolate;
-  background: #173f37;
+  background: #4d1427;
 }
 .invite-ready.cover-closed main, .invite-ready.cover-closed footer { display: none; }
 .cover::before {
-  background: radial-gradient(ellipse at 80% 45%, #2d6352, transparent 65%),
+  background: radial-gradient(ellipse at 80% 45%, #81334c, transparent 65%),
     repeating-linear-gradient(45deg, #f7d89d09 0 1px, transparent 1px 15px);
 }
 .cover::after {
   inset: .7rem;
   border: 1px solid #e6bd75;
   border-radius: 1rem;
-  box-shadow: inset 0 0 0 3px #1d473c, inset 0 0 0 4px #e6bd7566;
+  box-shadow: inset 0 0 0 3px #5e2237, inset 0 0 0 4px #e6bd7566;
 }
 .cover .cover-content {
   width: min(100%, 63rem);
@@ -460,11 +460,11 @@ html[lang="hi"] .cover-copy h2 { line-height:1.12 }
 @keyframes stationery-fade { to { opacity: 0; } }
 .welcome { background: #f7ebd5; }
 .welcome-card { background: #fffaec; border-color: #a47d4d; }
-.welcome-art { border-color: #7a9477; }
-.schedule { background: linear-gradient(#e7ebdb, #f9efdc 58%); }
+.welcome-art { border-color: #b8884d; }
+.schedule { background: linear-gradient(#ead5c7, #f9efdc 58%); }
 .venues { background: #faf0dc; }
-.venue-photo-caption { background: #244e42; }
-footer { background: #173f37; }
+.venue-photo-caption { background: #6a273b; }
+footer { background: #4d1427; }
 @media (max-width: 690px) {
   .cover .cover-content { grid-template-columns: minmax(0,1fr); grid-template-rows: auto; gap: .8rem; }
   .cover .cover-copy, .opening-button, .opening-arch { grid-area: auto; }
@@ -476,3 +476,67 @@ footer { background: #173f37; }
 @media (prefers-reduced-motion: reduce) {
   .cover-opening .cover { animation: none; }
 }
+
+
+.welcome {
+  width: 100%;
+  background: radial-gradient(ellipse at 8% 15%, #ead0b8, transparent 55%), #f7ead4;
+  padding-inline: max(clamp(1.25rem, 5vw, 5rem), calc((100% - 83rem) / 2));
+}
+.welcome-art {
+  position: relative;
+  overflow: hidden;
+  border: 3px double #ab783f;
+  background: #f9deac;
+  padding: .32rem;
+}
+.welcome-art img { border-radius: inherit; }
+.welcome-art figcaption {
+  border-radius: 0 0 .2rem .2rem;
+  padding: .65rem .6rem;
+  color: #fff3da;
+  background: #601c34;
+  font-size: .875rem;
+  text-align: center;
+}
+.welcome-card {
+  position: relative;
+  width: min(100%, 37rem);
+  border: 3px double #a8763c;
+  background: #fff8e8;
+  box-shadow: 0 .9rem 2rem #5a203124, inset 0 0 0 5px #fff8e8, inset 0 0 0 6px #dbbb86;
+}
+.welcome-card::before, .welcome-card::after {
+  content: "❦";
+  position: absolute;
+  top: .65rem;
+  color: #8a542b;
+  font-size: 1.1rem;
+  line-height: 1;
+  pointer-events: none;
+}
+.welcome-card::before { left: .85rem; }
+.welcome-card::after { right: .85rem; }
+.welcome-card .invitation-links { gap: .55rem; }
+.welcome-card .invitation-links .jump {
+  padding: .48rem .7rem;
+  border: 1px solid #be9764;
+  border-radius: .35rem;
+  color: #6e2239;
+  text-decoration: none;
+}
+.date-section { background: #f3e4cc; }
+.scroll .date-paper {
+  background: linear-gradient(90deg,#782c4440, transparent 12%, transparent 88%,#782c4440),
+    url('/assets/rose-paper.webp') center / cover, #fbebcb;
+}
+.schedule { background: linear-gradient(165deg, #eacbbc, #faf0dc 53%); }
+.event-card { border: 3px double #b98d56; }
+.event-body { background: #fff6e5; }
+.venues .venue-card {
+  padding: clamp(.8rem, 3vw, 1.35rem);
+  border: 1px solid #bd9662;
+  background: #fff8e9;
+  box-shadow: 0 .45rem 1.25rem #5a203115;
+}
+footer { background: #4d1427; }
