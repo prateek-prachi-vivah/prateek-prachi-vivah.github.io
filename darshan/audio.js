@@ -3,18 +3,18 @@ const transition = .16;
 const tones = { door: 293.66, sanctum: 392, darshan: 349.23, cord: 523.25 };
 
 export function weddingAudio({ source, control, hindi, isCardOpen }) {
-  const tracks = [source.src, new URL(source.dataset.cardSrc, document.baseURI).href];
+  const tracks = [source.dataset.openingSrc, source.dataset.cardSrc].map(path => new URL(path, document.baseURI).href);
   const labels = hindi ? {
     play: ['वैकुंठ संगीत सुनें', 'गणेश भजन सुनें'],
-    pause: 'ध्वनि बंद करें', waiting: 'संगीत लोड हो रहा है', retry: 'संगीत फिर चलाएँ'
+    pause: 'संगीत रोकें', waiting: 'संगीत लोड हो रहा है', retry: 'संगीत फिर चलाएँ'
   } : {
     play: ['Play Vaikuntha music', 'Play Ganesh bhajan'],
-    pause: 'Mute sound', waiting: 'Loading sound', retry: 'Retry sound'
+    pause: 'Pause music', waiting: 'Loading sound', retry: 'Retry sound'
   };
   let preference;
   try { preference = sessionStorage.getItem(preferenceKey); } catch {}
   let phase = Number(isCardOpen());
-  let playingPhase = !phase && !source.paused ? 0 : null;
+  let playingPhase = !source.paused && source.src === tracks[phase] ? phase : null;
   let context, music, chimes;
   const liveChimes = new Set();
   let generation = 0;
@@ -181,7 +181,8 @@ export function weddingAudio({ source, control, hindi, isCardOpen }) {
     },
     startCard() {
       phase = 1;
-      play({ fresh: true });
+      if (preference !== 'off' && playingPhase === 1 && !source.paused) enableMixer();
+      else play({ fresh: true });
       show();
     },
     cue

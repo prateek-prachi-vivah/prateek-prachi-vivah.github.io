@@ -1,4 +1,4 @@
-import { weddingAudio } from './audio.js?v=10';
+import { weddingAudio } from './audio.js?v=11';
 
 const root = document.documentElement;
 const intro = document.querySelector('#top');
@@ -62,10 +62,7 @@ function reveal({ cinematic = false, focus = false } = {}) {
   document.body.classList.add('card-visible');
   main.inert = footer.inert = false;
   if (animate) {
-    welcome.classList.remove('book-opening');
-    requestAnimationFrame(() => {
-      if (opened) welcome.classList.add('book-opening');
-    });
+    welcome.classList.add('book-opening');
   }
   if (focus || window.scrollY > 0) window.scrollTo({ top: 0, behavior: 'instant' });
   if (focus) target.focus({ preventScroll: true });
@@ -136,6 +133,7 @@ async function play() {
   document.body.classList.remove('card-visible');
   root.classList.add('intro-open');
   intro.classList.add('is-playing');
+  welcome.classList.remove('book-opening');
   stage.replaceChildren();
   caption.textContent = scenes.ganesh.textContent;
   intro.setAttribute('aria-label', scenes.ganesh.dataset.description);
@@ -176,6 +174,9 @@ async function play() {
 
 intro.addEventListener('animationend', event => {
   if (opened && event.target === intro && event.animationName === 'darshan-dissolve') intro.hidden = true;
+});
+welcome.addEventListener('animationend', event => {
+  if (event.animationName === 'bound-cover-open') welcome.classList.remove('book-opening');
 });
 skip.addEventListener('click', event => {
   event.preventDefault();
