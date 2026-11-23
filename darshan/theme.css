@@ -1,0 +1,252 @@
+:root {
+  --ink: #382722;
+  --wine: #602634;
+  --gold: #805528;
+  --paper: #fff4db;
+  --border: #cba977;
+  --temple: #1e1824;
+  --light: #fff2d9;
+  --serif: 'Noto Invitation', Georgia, serif;
+  color-scheme: light;
+  background: #f7e8d0;
+}
+@font-face {
+  font-family: 'Noto Invitation';
+  src: url('./devanagari.woff') format('woff');
+  font-display: swap;
+  unicode-range: U+0900-097F, U+1CD0-1CFF, U+A8E0-A8FF, U+200C-200D;
+}
+html[lang="hi"] { --serif: 'Noto Invitation', 'Noto Serif Devanagari', 'Nirmala UI', Georgia, serif; }
+body { background: #f7e8d0; }
+.intro-open { overflow: hidden; }
+.intro-open main, .intro-open footer { display: none; }
+html:not(.intro-open) .intro { display: none; }
+.intro {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  overflow: hidden;
+  isolation: isolate;
+  background: #251b25;
+  color: var(--light);
+}
+.film, .film-poster, .film-scene, .film-shot, .film-shot img, .gate-opening, .gate-opening span {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.film { overflow: hidden; background: radial-gradient(ellipse at 50% 42%,#4a2a2b,#251b25 65%,#19151d); }
+.film-poster, .film-shot img { object-fit: cover; object-position: center 42%; }
+.film::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg,#150f1a55,transparent 17%,transparent 56%,#19121bab 79%,#19121bec 100%);
+}
+.film-shot img { animation: camera 3.7s cubic-bezier(.18,.58,.28,1) both; }
+.film-shot { animation: exposure .25s ease-out both; }
+@keyframes camera { from { transform: scale(1); } to { transform: scale(1.055); } }
+@keyframes exposure { from { filter: brightness(.68); } to { filter: brightness(1); } }
+
+.gate-opening { pointer-events: none; }
+.gate-opening span {
+  background: var(--gate) center 42% / cover no-repeat;
+  animation: leaf-left 2.15s cubic-bezier(.55,.06,.24,1) both;
+  clip-path: inset(0 50% 0 0);
+}
+.gate-opening span + span { clip-path: inset(0 0 0 50%); animation-name: leaf-right; }
+@keyframes leaf-left { 0%,18% { transform: translateX(0); } to { transform: translateX(-51%); } }
+@keyframes leaf-right { 0%,18% { transform: translateX(0); } to { transform: translateX(51%); } }
+.film-shot[data-shot="hall"] img { animation-delay: 0s; }
+
+.intro-content {
+  position: absolute;
+  left: max(1rem, env(safe-area-inset-left));
+  right: max(1rem, env(safe-area-inset-right));
+  bottom: max(1rem, calc(.65rem + env(safe-area-inset-bottom)));
+  display: grid;
+  justify-items: center;
+  gap: .35rem;
+  text-align: center;
+}
+#scene-caption {
+  font: 500 clamp(2rem, 7vw, 4rem)/1.21 var(--serif);
+  text-shadow: 0 2px 20px #130a13, 0 2px 7px #130a13;
+  text-wrap: balance;
+  margin: 0 0 .55rem;
+}
+#intro-actions {
+  width: min(100%, 32rem);
+  display: grid;
+  grid-template-columns: minmax(0,1fr) minmax(0,1fr);
+  gap: .56rem;
+}
+#intro-actions button, .intro-skip, .invite-tools a, .invite-tools button {
+  min-height: 44px;
+  min-width: 44px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 999px;
+  padding: .56rem .85rem;
+  font-size: .89rem;
+  line-height: 1.25;
+  font-weight: 650;
+  text-decoration: none;
+}
+#cover-hint { border: 1px solid #f6d69b; background: #f6d69b; color: #311e25; }
+#open-silent { border: 1px solid #dfb679af; background: #281b27d9; color: var(--light); }
+.intro-skip { color: var(--light); background: #201622b8; border: 1px solid #fff1d22e; }
+#cover-hint:hover { background: #ffe5b9; }
+#open-silent:hover, .intro-skip:hover { background: #462938; }
+.intro-skip:focus:not(:focus-visible) { outline: 0; }
+.invite-tools {
+  position: fixed;
+  z-index: 14;
+  inset: max(.65rem,env(safe-area-inset-top)) max(.65rem,env(safe-area-inset-right)) auto auto;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+.invite-tools a, .invite-tools button {
+  background: #2b1c29ee;
+  color: var(--light);
+  border: 1px solid #cfa26d;
+  box-shadow: 0 3px 16px #160f1c4d;
+}
+
+.welcome.scene {
+  display: grid;
+  grid-template-columns: minmax(0,1fr);
+  width: 100%;
+  min-height: 100svh;
+  gap: 0;
+  padding: 4.25rem 0 0;
+  background: #fbedd4;
+  border: 0;
+}
+.welcome::before { display: none; }
+.welcome .welcome-card {
+  width: 100%;
+  max-width: 46rem;
+  margin: 0;
+  padding: clamp(1.55rem,5vw,3.75rem) clamp(.9rem,5vw,3.25rem) 2rem;
+  border: 0;
+  border-radius: 0;
+  background: radial-gradient(ellipse at 50% 27%,#fff9e9,#fcf0da 68%,#f0dcb8);
+  box-shadow: none;
+}
+.welcome-card::before, .welcome-card::after { display: none; }
+.welcome .seal { font-size: 1.9rem; color: var(--wine); margin: 0 auto .38rem; }
+.welcome .invocation, .welcome .narayana-invocation { font-weight: 650; color: var(--wine); }
+.welcome .narayana-invocation { font-size: .9rem; }
+.welcome .ganesh-verse { line-height: 1.65; color: #643d2a; }
+.welcome h1, html[lang="hi"] .welcome h1 {
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  flex-wrap: wrap;
+  column-gap: .22em;
+  color: var(--wine);
+  font-size: clamp(2.37rem,9vw,4.6rem);
+  line-height: 1.13;
+  margin: .44rem 0 .73rem;
+}
+.welcome h1 span { overflow-wrap: anywhere; }
+.welcome h1 i { color: #83562b; }
+.welcome .invitation-line { color: #503529; }
+.primary-date {
+  display: grid;
+  gap: .26rem;
+  margin: 1.1rem 0 .52rem;
+  font-weight: 650;
+  color: var(--wine);
+}
+.primary-date .date-role { font-size: .88rem; color: #76502c; }
+.primary-date time { font-family: var(--serif); font-size: clamp(1.13rem,3vw,1.6rem); }
+.wedding-range { color: #6d4933; }
+.welcome .invitation-links { justify-content: center; gap: .45rem; margin-top: 1rem; }
+.welcome .invitation-links a { display: inline-grid; place-items: center; min-height: 44px; }
+.welcome .welcome-art {
+  order: 1;
+  margin: 0;
+  width: 100%;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+.welcome .welcome-art img {
+  display: block;
+  width: 100%;
+  border-radius: 0;
+  object-fit: cover;
+  object-position: center 59%;
+  aspect-ratio: 3 / 2;
+}
+.date-section {
+  background: #f9ead1;
+  border-block: 1px solid #dab98c;
+}
+.date-section::before, .date-section::after, .schedule::before, .venues::before { display: none; }
+.scroll .date-paper { background: #fff5de; }
+.scroll .paper-frame { border: 1px solid #c3a271; box-shadow: none; }
+.schedule {
+  background: linear-gradient(180deg,#2c202e,#241a28);
+  color: var(--light);
+  border: 0;
+}
+.schedule > :is(h2,.eyebrow,.swipe-hint,.current-event) { color: var(--light); }
+.schedule .schedule-view, .schedule .carousel-nav > button {
+  color: var(--light); background: #3c2736; border: 1px solid #cbab76; min-height: 44px; min-width: 44px;
+}
+.schedule .schedule-view[aria-pressed="true"] { color: #382023; background: #f5d8a0; }
+.schedule .carousel-nav { max-width: min(100%,44rem); padding-inline: .35rem; flex-wrap: nowrap; }
+.carousel-nav .dots {
+  flex: 1 1 auto; order: 0; overflow-x: auto; flex-wrap: nowrap;
+  justify-content: flex-start; padding: .45rem; gap: .34rem; scroll-snap-type: x proximity;
+  scrollbar-color: #ad885c transparent; scrollbar-width: thin;
+}
+.carousel-nav .dot {
+  flex: 0 0 44px; width: 44px; height: 44px; min-width: 44px; min-height: 44px;
+  scroll-snap-align: center;
+}
+.carousel-nav .dot[aria-current="true"] { outline: 2px solid #f6ce8d; outline-offset: 2px; }
+.carousel-nav .dot:focus-visible { outline: 3px solid #fff2d9; outline-offset: 2px; }
+.schedule .event-card { background: #fff3db; border-color: #cba977; }
+.schedule .event-body { color: var(--ink); background: #fff3db; }
+.venues { background: #f9ebd2; }
+.venues .venue-card { border: 1px solid #ccb087; background: #fff4df; box-shadow: 0 9px 20px #4f2f1a13; }
+footer { background: #2b1f2e; color: var(--light); }
+footer :is(.seal,.eyebrow,.closing,.jump,a) { color: var(--light); }
+:focus-visible { outline: 3px solid #b5814a; outline-offset: 4px; }
+.intro :focus-visible, .invite-tools :focus-visible { outline-color: #fff2d9; }
+@media (min-width: 720px) and (min-aspect-ratio: 4 / 5) {
+  .film-poster, .film-shot img { object-fit: contain; }
+  .gate-opening span { background-size: contain; }
+  .welcome.scene {
+    grid-template-columns: minmax(0,.9fr) minmax(0,1fr);
+    padding: clamp(3.5rem,8vw,8rem) clamp(1.35rem,6vw,6rem);
+    gap: 1rem;
+    background: #312130;
+    place-content: center;
+    align-items: stretch;
+  }
+  .welcome .welcome-card { background: #fff3dc; }
+  .welcome .welcome-art { order: -1; height: 100%; }
+  .welcome .welcome-art img { height: 100%; max-height: 65rem; aspect-ratio: 4 / 5; }
+}
+@media (orientation: landscape) and (max-height: 540px) {
+  .film-poster, .film-shot img { object-fit: contain; }
+  .gate-opening span { background-size: contain; }
+  #scene-caption { font-size: clamp(1.15rem,5vh,1.8rem); margin-bottom: 0; }
+  .intro-content { bottom: .35rem; gap: .1rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .film-shot, .film-shot img, .gate-opening span { animation: none; }
+  #replay-invitation { display: none; }
+}
+#save-the-date, #schedule, #venues { scroll-margin-top: 4.25rem; }
+/* Follow the ordinary skip link even if the opening script could not load. */
+.intro-open:has(main :target) { overflow: auto; }
+.intro-open:has(main :target) .intro { display: none; }
+.intro-open:has(main :target) main, .intro-open:has(main :target) footer { display: block; }
