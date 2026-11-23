@@ -1,0 +1,113 @@
+:root {
+  --ink:#463332;
+  --wine:#57232c;
+  --gold:#875b35;
+  --paper:#fbf6ec;
+  --border:#dbc29b;
+  background:#f8f1e5;
+}
+body { background:#f8f1e5 }
+.cover {
+  background:radial-gradient(ellipse at 50% 44%,#684137 0%,#38232a 54%,#21151a 100%);
+}
+.cover::before {
+  background:linear-gradient(90deg,#25161be0,#27181995 48%,#26151cd8),url('/rajputana/palace.webp') center 48% / cover;
+  opacity:1;
+}
+.cover::after {
+  inset:1.05rem; border-color:#c39c6448; outline:1px solid #c39c6430; outline-offset:-5px;
+}
+.cover-content { gap:clamp(.8rem,3.1svh,1.65rem); animation:none }
+.book { width:min(73vw,18.8rem,46svh); filter:drop-shadow(0 26px 26px #0d0808a6) }
+.book-page { border-radius:3px 10px 10px 3px; box-shadow:4px 4px 0 #2b121b }
+.book-front {
+  justify-items:center; align-content:end;
+  padding:1.1rem .75rem clamp(1.25rem,3.7svh,2rem); gap:.35rem;
+  background:
+    linear-gradient(180deg,#381e2608 1%,#4321261c 38%,#4b2228 68%,#421c25 100%),
+    url('/rajputana/palace.webp') center 39% / cover;
+  box-shadow:inset 8px 0 10px #2f151767,inset -2px 0 5px #ffedb240;
+  color:#fff2d3;
+}
+.book-frame { inset:5%; outline:none; border-color:#deb984b6 }
+.book-frame span { width:10%; border-color:#f0cc91ad }
+.book .book-front .seal { width:2.25rem; font-size:1.28rem; background:#552b32da; color:#f7d6a0; outline:none }
+.book-title { font-size:clamp(1.32rem,5.3vw,2.13rem); line-height:1.08 }
+.book-couple { font-size:clamp(1.02rem,4vw,1.48rem); line-height:1.16 }
+.book-date { font-size:clamp(.58rem,2.3vw,.75rem); letter-spacing:.15em }
+.gold-rule { width:57%; font-size:.71rem }
+.cover-hint {
+  border:1px solid #bc9469; color:#ffe7c5; background:#2b1a21aa;
+  text-shadow:none; text-transform:none; letter-spacing:.045em; border-radius:3px;
+  padding:.48rem .88rem; min-height:44px;
+}
+.cover-hint span { display:inline; width:auto; height:auto; border:0; margin:0 .3rem 0 0; color:#d9ae73 }
+.cover .book:hover .book-flap { transform:rotateY(-5deg) }
+.cover-opening .cover .book .book-flap { transform:rotateY(-144deg); transition-duration:1.05s }
+.cover-opening .book { animation:folio-turn 1.2s ease both }
+@keyframes folio-turn {
+  65% { opacity:1; transform:translateX(3%) scale(1.025) }
+  to { opacity:.85; transform:translateX(6%) scale(1.045) }
+}
+.cover-opening .cover { animation:veil-lift .57s .68s ease-in-out both }
+.cover-opening .book-front::after { animation:none }
+.welcome { background:#39262a }
+.welcome::before {
+  background:linear-gradient(90deg,#3a252b9c,#52373222,#3a252b9c),url('/rajputana/palace.webp') center 44% / cover;
+  opacity:.92;
+}
+.welcome-card {
+  background:#faf0dedf; border-radius:47% 47% 0 0 / 32% 32% 0 0;
+  border:1px solid #b9905d; box-shadow:0 12px 62px #2010126e,inset 0 0 0 5px #fff4e1,inset 0 0 0 6px #c7a274;
+  padding:clamp(1.55rem,5.2svh,3rem) 1rem 1.55rem;
+}
+.welcome h1 { font-size:clamp(2.5rem,7.3vw,4.75rem); line-height:.99 }
+.welcome h1 i { color:#a37245; font-size:.5em }
+.welcome.arriving .welcome-card { animation:arrival 1.15s .12s ease-out both }
+.welcome.arriving h1>* { animation:ink-appear .56s .33s ease-out both }
+.welcome.arriving h1>.bride-name { animation-delay:.63s }
+@keyframes arrival { from { opacity:0; transform:translateY(18px) } to { opacity:1; transform:none } }
+.petals { z-index:2 }
+.petal { width:10px;height:7px; opacity:0; background:#ba776d; animation-duration:2.3s }
+.date-section { border-block:1px solid #d9bd93; background:#ede0cd; padding-block:clamp(3.5rem,9vw,6rem) }
+.date-section::before { background:url('/rajputana/palace.webp') center 55% / cover; opacity:.13; mask-image:none }
+.date-section h2 { font-size:clamp(2.4rem,7vw,4.4rem); margin:.34rem 0 1.35rem }
+.rod { background:linear-gradient(#efd290,#c39b5a 43%,#997044 79%); box-shadow:0 2px 6px #4e30124d }
+.date-paper { background:linear-gradient(90deg,#e2ceb0,#f9f0e0 13%,#fff7e9 80%,#e2ceb0) }
+.paper-frame { border-color:#b78e5d }
+.schedule { background:linear-gradient(#f7eddd,#fcf8ef 77%); border-bottom:1px solid #e3cfae }
+.carousel { --event-card-width:min(92vw,51rem); margin-top:.65rem }
+.event-card {
+  display:grid; grid-template-columns:minmax(0,.89fr) minmax(0,1.11fr);
+  align-items:center; border-color:#c5a779; border-radius:.28rem;
+  background:#fff9ee; box-shadow:0 12px 30px #482a2918; opacity:.66;
+  transform:scale(.968); transform-origin:center center;
+}
+.event-card.active { transform:none; opacity:1 }
+.event-art { align-self:center }
+.event-body { padding:clamp(1.15rem,3vw,2rem) }
+.event-date { letter-spacing:.025em }
+.event-theme { color:#653c34 }
+.dress { border-radius:.2rem; background:#f5e9d7; border-color:#e0c7a7 }
+.swatches li { font-size:.79rem }
+.carousel-nav>button { background:#fffaf0; color:var(--wine) }
+.current-event { margin-top:.45rem }
+.venues { padding-top:clamp(2.1rem,6vw,4.5rem) }
+.venue-card { border-radius:.28rem; box-shadow:none }
+.venue-card .map-art::after { background:#f3d9ae24 }
+footer { background:radial-gradient(ellipse at 50% 0,#643139,#351e25 82%) }
+.button:not(.whatsapp) { border-radius:.23rem }
+.invite-tools a,.invite-tools button { border-radius:.23rem }
+.invite-tools button[aria-pressed="true"] { background:#57232c }
+html[lang="hi"] .welcome h1 { line-height:1.14 }
+@media (max-width:690px) {
+  .carousel { --event-card-width:min(92vw,30rem) }
+  .event-card { grid-template-columns:1fr }
+  .event-art { width:100%; height:auto }
+  .cover::before,.welcome::before { background-position:center }
+}
+@media (max-height:540px) {
+  .book { width:min(60vw,41svh,15rem) }
+  .book-front { padding-bottom:.65rem }
+  .book .book-front .seal { width:1.5rem; font-size:.91rem }
+}
