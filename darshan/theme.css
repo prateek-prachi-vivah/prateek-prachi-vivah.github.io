@@ -621,3 +621,22 @@ footer :is(.seal,.eyebrow,.closing,.jump,a) { color: var(--light); }
 @media (prefers-reduced-motion: reduce) {
   .film-shot[data-shot="vishnu"] > img, .film-shot[data-gate] .portal-leaf { animation: none; }
 }
+
+.film-periphery { --frame-photo: url('./ganesh-temple-mobile.webp'); }
+.film-shot[data-shot="vishnu"] { --frame-photo: url('./narayana-temple.webp'); }
+.film-shot[data-gate] .portal-leaf { animation-duration: .74s; }
+.film-shot[data-gate="7"] .portal-leaf { animation-duration: 1.02s; }
+.film-shot[data-gate] .portal-aperture::after {
+  background: radial-gradient(ellipse at 50% 48%,#ffe6a733,transparent 70%);
+  opacity: 0;
+  animation: sanctum-reveal .74s ease-out both;
+}
+.film-shot[data-gate="7"] .portal-aperture::after { animation-duration: 1.02s; }
+@keyframes sanctum-reveal { 35% { opacity: 0; } 100% { opacity: .78; } }
+.welcome.scene.book-opening .book-jacket {
+  animation-timing-function: cubic-bezier(.3,.52,.18,1);
+  box-shadow: 14px 19px 45px #160d21bd, inset 10px 0 16px #1d0f1d77;
+}
+@media (prefers-reduced-motion: reduce) {
+  .film-shot[data-gate] .portal-aperture::after { animation: none; }
+}

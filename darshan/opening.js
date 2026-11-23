@@ -1,4 +1,4 @@
-import { weddingAudio } from './audio.js?v=5';
+import { weddingAudio } from './audio.js?v=6';
 
 const root = document.documentElement;
 const intro = document.querySelector('#top');
@@ -28,7 +28,7 @@ clearTimeout(window.invitationFallback);
 function artUrl(name) {
   const smallScene = name === 'entry' || name === 'hall' || name === 'mandap';
   const asset = smallScene && matchMedia('(max-width: 650px)').matches ? name + '-mobile' : name;
-  return new URL((name === 'vishnu' ? 'narayana-sculptural' : asset) + '.webp', import.meta.url).href;
+  return new URL((name === 'vishnu' ? 'narayana-temple' : asset) + '.webp', import.meta.url).href;
 }
 
 function load(name) {
@@ -128,7 +128,7 @@ async function play() {
   caption.textContent = scenes.ganesh.textContent;
   intro.setAttribute('aria-label', scenes.ganesh.dataset.description);
   audio.prepare();
-  hardStop = setTimeout(() => reveal({ cinematic: true }), 11200);
+  hardStop = setTimeout(() => reveal({ cinematic: true }), 12500);
   load('entry');
   load('hall');
   load('vishnu');
@@ -148,11 +148,11 @@ async function play() {
       caption.textContent = sceneList.dataset.gateLabel + ' ' + number + ' / 7';
       audio.cue(number === 7 ? 'sanctum' : 'door');
     }
-    await wait(number === 7 ? 890 : 620);
+    await wait(number === 7 ? 1050 : 760);
     if (token !== run) return;
   }
 
-  for (const [name, duration] of [['vishnu', 1900], ['mandap', 650]]) {
+  for (const [name, duration] of [['vishnu', 2100], ['mandap', 650]]) {
     const image = await getArt(name, 500);
     if (token !== run) return;
     if (!image) continue;
