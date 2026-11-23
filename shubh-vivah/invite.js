@@ -118,7 +118,7 @@ function openCover({ animate = true, focus = true } = {}) {
   if (animate && !motion.matches) {
     opening = true;
     root.classList.add('cover-opening');
-    setTimeout(finish, 640);
+    setTimeout(finish, 2150);
   } else {
     finish();
   }
@@ -229,7 +229,7 @@ for (const [index, event] of wedding.events.entries()) {
   card.id = 'celebration-' + (index + 1);
   const art = create('img', 'event-art');
   art.src = '/shubh-vivah/photos/function-' + (index + 1) + '.webp';
-  art.alt = '';
+  art.alt = isHindi ? event.title + ' का चित्रण' : 'Illustration for ' + event.title;
   art.width = 768;
   art.height = 512;
   art.loading = 'lazy';
@@ -261,6 +261,7 @@ for (const [index, event] of wedding.events.entries()) {
   thumbnail.removeAttribute('width');
   thumbnail.removeAttribute('height');
   thumbnail.className = 'event-thumbnail';
+  thumbnail.setAttribute('aria-hidden', 'true');
   dot.append(thumbnail);
   dot.addEventListener('click', () => showCard(index));
   dots.append(dot);
@@ -440,3 +441,18 @@ musicToggle.addEventListener('click', () => {
     music.pause();
   }
 });
+
+if ('IntersectionObserver' in window && !motion.matches) {
+  const reveal = new IntersectionObserver(entries => {
+    for (const entry of entries) {
+      if (!entry.isIntersecting) continue;
+      reveal.unobserve(entry.target);
+      entry.target.animate([{ opacity: .78 }, { opacity: 1 }], {
+        duration: 360, easing: 'ease-out',
+      });
+    }
+  }, { threshold: .14 });
+  for (const section of document.querySelectorAll('.date-section, .schedule, .venues')) {
+    reveal.observe(section);
+  }
+}
