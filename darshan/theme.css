@@ -605,3 +605,19 @@ footer :is(.seal,.eyebrow,.closing,.jump,a) { color: var(--light); }
   .film-shot[data-gate]:not([data-gate="1"]) .portal { width: min(155vw, 75svh); }
 }
 .film:has(.film-shot) .film-poster { visibility: hidden; }
+
+.film-shot[data-shot="vishnu"] {
+  --frame-photo: url('./narayana-sculptural.webp');
+  transform-style: preserve-3d;
+}
+.film-shot[data-shot="vishnu"] > img { animation: narayana-depth 1.9s ease-out both; }
+.film-shot[data-gate] .portal-leaf { animation-duration: .61s; }
+.film-shot[data-gate="7"] .portal-leaf { animation-duration: .87s; }
+.film-shot[data-gate="7"] .portal-interior { filter: brightness(1.18) saturate(1.07); }
+@keyframes narayana-depth {
+  from { transform: perspective(1200px) translateZ(-28px); opacity: .55; }
+  to { transform: perspective(1200px) translateZ(0); opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .film-shot[data-shot="vishnu"] > img, .film-shot[data-gate] .portal-leaf { animation: none; }
+}

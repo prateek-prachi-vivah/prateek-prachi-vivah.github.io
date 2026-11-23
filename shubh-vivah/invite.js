@@ -126,15 +126,33 @@ tassel.addEventListener('lostpointercapture', finishPull);
 
 const carousel = document.querySelector('#events');
 const dots = document.querySelector('#event-dots');
+const ceremonyArtwork = isHindi ? [
+  'श्रीराम और माता सीता के तिलक और सगाई का भक्तिमय चित्र',
+  'माता पूजन में दीप अर्पित करते श्रीराम और माता सीता',
+  'मेहंदी की रस्म में श्रीराम और माता सीता',
+  'श्रीराम और माता सीता के सान्निध्य में संगीत करते दिव्य कलाकार',
+  'हल्दी की रस्म में श्रीराम और माता सीता',
+  'मंडप मामेरा में श्रीराम और माता सीता के समक्ष भेंट अर्पित करते दिव्य परिचारक',
+  'श्रीराम और उनकी बारात में दिव्य देवगण'
+] : [
+  'Devotional depiction of Shri Ram and Mata Sita at Tilak and Sagai',
+  'Shri Ram and Mata Sita offering a lamp at Mata Pujan',
+  'Shri Ram and Mata Sita during the Mehendi ceremony',
+  'Celestial musicians performing for Shri Ram and Mata Sita at Sangeet',
+  'Shri Ram and Mata Sita during the Haldi ceremony',
+  'Divine attendants offering gifts before Shri Ram and Mata Sita at Mandap Mamera',
+  'Shri Ram with celestial devas in the Baraat'
+];
 for (const [index, event] of wedding.events.entries()) {
   const card = create('article', 'event-card');
   card.style.setProperty('--accent', event.accent);
   card.id = 'celebration-' + (index + 1);
   const art = create('img', 'event-art');
-  art.src = '/darshan/ceremony-' + (index + 1) + '.webp';
-  art.alt = isHindi ? event.title + ' का चित्रण' : 'Illustration for ' + event.title;
+  art.src = '/darshan/devotional-ceremony-' + (index + 1) + '.webp';
+  art.alt = ceremonyArtwork[index] || event.title;
   art.width = 768;
   art.height = 512;
+  art.decoding = 'async';
   art.loading = 'lazy';
   const body = create('div', 'event-body');
   const time = create('time', 'event-date', longDate.format(dateFrom(event.date)));

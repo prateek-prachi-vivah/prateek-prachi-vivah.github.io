@@ -2,7 +2,7 @@ const preferenceKey = 'wedding-audio-v2';
 
 /** A single transport keeps the Vaikuntha score and Ganesh bhajan from overlapping. */
 export function weddingAudio({ source, control, hindi, isCardOpen }) {
-  const score = new Audio(new URL('./vaikuntha-score.mp3', import.meta.url));
+  const score = new Audio(new URL('./vaikuntha-flute.mp3', import.meta.url));
   score.preload = 'none';
   const tracks = [score, source];
   const levels = [.78, 2.05];
@@ -73,7 +73,7 @@ export function weddingAudio({ source, control, hindi, isCardOpen }) {
 
   function startNative(token, index) {
     const player = tracks[index];
-    player.loop = index === 1;
+    player.loop = true;
     player.volume = index ? 1 : .75;
     if (positions[index] > 0) {
       try { player.currentTime = positions[index]; } catch {}
@@ -129,7 +129,7 @@ export function weddingAudio({ source, control, hindi, isCardOpen }) {
           const gain = context.createGain();
           const start = context.currentTime;
           node.buffer = buffer;
-          node.loop = index === 1;
+          node.loop = true;
           gain.gain.setValueAtTime(.001, start);
           gain.gain.linearRampToValueAtTime(levels[index], start + .46);
           node.connect(gain).connect(bus);
@@ -184,7 +184,7 @@ export function weddingAudio({ source, control, hindi, isCardOpen }) {
   function usePhase(index, fresh) {
     phase = index;
     if (fresh) positions[index] = 0;
-    if (permitted && preference !== 'off') play({ fade: .28, fresh });
+    if (preference !== 'off') play({ fade: .28, fresh });
     else if (loading) stop();
     else show();
   }
@@ -201,6 +201,10 @@ export function weddingAudio({ source, control, hindi, isCardOpen }) {
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) stop();
     else if (permitted) play();
+  });
+  document.addEventListener('click', event => {
+    if (event.target.closest('#sound-toggle') || active || loading || preference === 'off') return;
+    play({ gesture: true });
   });
   show();
   return {
