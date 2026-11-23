@@ -10,11 +10,13 @@ const enter = document.querySelector('#cover-hint');
 const skip = document.querySelector('.skip');
 const replay = document.querySelector('#replay-invitation');
 const music = document.querySelector('#wedding-music');
+const tapSound = document.querySelector('#tap-sound');
 const sound = document.querySelector('#sound-toggle');
 const motion = matchMedia('(prefers-reduced-motion: reduce)');
 const hindi = root.lang === 'hi';
 const boundaries = [0, 3.4, 5.8, 10.2, 14.3, 17.5];
 let state = 'idle';
+let soundEnabled = false;
 let startTimer;
 let animationFrame;
 let filmStarted;
@@ -85,6 +87,9 @@ function reveal({ focus = false } = {}) {
   clearTimeout(startTimer);
   cancelAnimationFrame(animationFrame);
   film.pause();
+  if (soundEnabled && !music.paused) {
+    if (!focus || lastFilmTime < 15) music.pause();
+  }
   gate.hidden = true;
   main.inert = footer.inert = false;
   root.classList.remove('darshan-closed');
@@ -97,6 +102,7 @@ function reveal({ focus = false } = {}) {
 
 function close() {
   state = 'idle';
+  if (!music.paused) music.pause();
   gate.hidden = false;
   enter.hidden = false;
   main.inert = footer.inert = true;
@@ -107,20 +113,48 @@ function close() {
 }
 
 function syncSound() {
-  sound.setAttribute('aria-pressed', String(!music.paused));
-  sound.textContent = music.paused
-    ? (hindi ? 'भजन सुनें' : 'Play bhajan')
-    : (hindi ? 'भजन रोकें' : 'Pause bhajan');
+  sound.setAttribute('aria-pressed', String(soundEnabled));
+  sound.textContent = soundEnabled
+    ? (hindi ? 'संगीत बंद करें' : 'Mute sound')
+    : (hindi ? 'संगीत चालू करें' : 'Enable sound');
 }
 
-for (const event of ['play', 'pause', 'ended']) music.addEventListener(event, syncSound);
+function playScore() {
+  music.currentTime = state === 'playing' ? Math.max(0, lastFilmTime) : 0;
+  music.play().catch(() => {
+    soundEnabled = false;
+    syncSound();
+  });
+}
+
 sound.addEventListener('click', () => {
-  if (music.paused) music.play().catch(syncSound);
-  else music.pause();
+  soundEnabled = !soundEnabled;
+  syncSound();
+  if (!soundEnabled) {
+    music.pause();
+    tapSound.pause();
+    return;
+  }
+  playScore();
 });
 syncSound();
 
-enter.addEventListener('click', start);
+enter.addEventListener('click', () => {
+  soundEnabled = true;
+  syncSound();
+  start();
+  playScore();
+});
+gate.addEventListener('pointerup', event => {
+  if (state !== 'playing' || event.target.closest('a, button')) return;
+  if (!soundEnabled) {
+    soundEnabled = true;
+    syncSound();
+    playScore();
+  }
+  tapSound.currentTime = 0;
+  tapSound.play().catch(() => {});
+});
 skip.addEventListener('click', event => {
   if (state === 'open') return;
   event.preventDefault();
@@ -134,6 +168,7 @@ replay.addEventListener('click', event => {
   else {
     skip.focus({ preventScroll: true });
     start();
+    if (soundEnabled) playScore();
   }
 });
 window.addEventListener('hashchange', () => {
@@ -151,5 +186,5 @@ if (location.hash && location.hash !== '#top') {
   requestAnimationFrame(() => document.getElementById(location.hash.slice(1))?.scrollIntoView());
 } else {
   close();
-  if (!motion.matches) startTimer = setTimeout(start, 1100);
+  if (!motion.matches) startTimer = setTimeout(start, 2400);
 }
