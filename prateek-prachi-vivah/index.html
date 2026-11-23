@@ -27,8 +27,8 @@
 
 <link rel="stylesheet" href="/styles.css">
 <link rel="stylesheet" href="/rajputana/theme.css">
-<link rel="stylesheet" href="/shubh-vivah/theme.css?v=31">
-<script type="module" src="/shubh-vivah/invite.js?v=31"></script>
+<link rel="stylesheet" href="/shubh-vivah/theme.css?v=32">
+<script type="module" src="/shubh-vivah/invite.js?v=32"></script>
 </head>
 <body>
 <nav class="invite-tools" aria-label="निमंत्रण की भाषा">
@@ -41,15 +41,24 @@
   <div class="cover-content">
     <figure class="opening-arch" aria-hidden="true">
       <img src="/shubh-vivah/photos/haveli-entrance.webp" alt="" width="768" height="512" fetchpriority="high" decoding="async">
+      <div class="invitation-leaf">
+        <div class="leaf-front" lang="sa">
+          <span class="leaf-ornament">❦</span>
+          <span class="leaf-seal">ॐ</span>
+          <strong>श्री गणेशाय नमः</strong>
+          <span class="leaf-ornament">❦</span>
+        </div>
+        <div class="leaf-back"></div>
+      </div>
     </figure>
     <div class="cover-copy">
       <p class="cover-kicker">शादी का निमंत्रण</p>
       <h2><span class="groom-name">प्रतीक</span> <i>और</i> <span class="bride-name">प्राची</span></h2>
-      <div class="cover-rule" aria-hidden="true">✦</div>
+      <p id="cover-invocation" class="cover-invocation" lang="sa">श्री गणेशाय नमः</p>
       <time datetime="2026-12-09">बुधवार, 9 दिसंबर 2026</time>
       <p class="cover-place">द पटेल लैंडमार्क गार्डन · कुरवाई</p>
     </div>
-    <button type="button" class="opening-button" id="cover-hint" aria-controls="welcome">निमंत्रण खोलें</button>
+    <button type="button" class="opening-button" id="cover-hint" aria-controls="welcome" aria-describedby="cover-invocation">निमंत्रण खोलें</button>
   </div>
 </header>
 <main>
