@@ -57,17 +57,26 @@ const root = document.documentElement;
 const book = document.querySelector('#open-book');
 const welcome = document.querySelector('#welcome');
 const content = [document.querySelector('main'), document.querySelector('footer')];
+const coverFilm = document.querySelector('#cover-film');
+coverFilm.addEventListener('playing', () => coverFilm.classList.add('is-playing'));
 let visitRecorded = false;
 function recordCardOpen() {
   if (visitRecorded || navigator.globalPrivacyControl || navigator.doNotTrack === '1') return;
   visitRecorded = true;
-  fetch('/_card-open', { method: 'POST', keepalive: true }).catch(() => {});
+  if (location.hostname.endsWith('.chatgpt.site')) {
+    fetch('/_card-open', { method: 'POST', keepalive: true }).catch(() => {});
+  }
 }
 let opening = false;
 
 function closeCover() {
   for (const element of content) element.inert = true;
   root.classList.add('cover-closed');
+  if (!motion.matches && !navigator.connection?.saveData) {
+    if (!coverFilm.hasAttribute('src')) coverFilm.src = '/shubh-vivah/photos/haveli-opening.mp4';
+    coverFilm.currentTime = 0;
+    coverFilm.play().catch(() => {});
+  }
   window.scrollTo({ top: 0, behavior: 'instant' });
 }
 
@@ -79,6 +88,7 @@ function openCover({ animate = true, focus = true } = {}) {
   const finish = () => {
     root.classList.remove('cover-closed', 'cover-opening');
     opening = false;
+    coverFilm.pause();
     for (const element of content) element.inert = false;
     if (focus) document.querySelector('#welcome-names').focus({ preventScroll: true });
     setTimeout(() => welcome.classList.remove('arriving'), 700);
@@ -227,6 +237,11 @@ for (const [index, event] of wedding.events.entries()) {
   const dot = create('button', 'dot');
   dot.type = 'button';
   dot.setAttribute('aria-label', text.showEvent(event.title));
+  const thumbnail = art.cloneNode();
+  thumbnail.removeAttribute('width');
+  thumbnail.removeAttribute('height');
+  thumbnail.className = 'event-thumbnail';
+  dot.append(thumbnail);
   dot.addEventListener('click', () => showCard(index));
   dots.append(dot);
 }

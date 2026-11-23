@@ -27,8 +27,8 @@
 <link rel="preload" as="image" href="/rajputana/palace.webp">
 <link rel="stylesheet" href="/styles.css">
 <link rel="stylesheet" href="/rajputana/theme.css">
-<link rel="stylesheet" href="/shubh-vivah/theme.css?v=23">
-<script type="module" src="/shubh-vivah/invite.js?v=23"></script>
+<link rel="stylesheet" href="/shubh-vivah/theme.css?v=25">
+<script type="module" src="/shubh-vivah/invite.js?v=25"></script>
 </head>
 <body>
 <nav class="invite-tools" aria-label="Invitation settings">
@@ -38,6 +38,7 @@
 <audio id="wedding-music" src="/shubh-vivah/ganesh-bhajan-soft.mp3" preload="auto" loop></audio>
 <a class="skip" href="#welcome">Skip to invitation</a>
 <header class="cover scene" id="top">
+  <video class="cover-film" id="cover-film" muted playsinline preload="none" aria-hidden="true"></video>
   <div class="cover-content">
     <div class="cover-copy">
       <p class="cover-kicker">शादी का निमंत्रण</p>
@@ -73,6 +74,9 @@
 </header>
 <main>
   <section class="welcome scene" id="welcome" aria-labelledby="welcome-names">
+    <figure class="welcome-art">
+      <img src="/rajputana/palace.webp" alt="" width="768" height="512" decoding="async">
+    </figure>
     <div class="welcome-card">
       <p class="seal devanagari" lang="hi">ॐ</p>
       <p class="invocation devanagari" lang="sa">श्री गणेशाय नमः</p>
@@ -152,5 +156,5 @@
   <p class="music-credit">Bhajan <a href="https://pixabay.com/music/religious-theme-free-soul-jai-ganesha-bhajan-399994/" target="_blank" rel="noopener noreferrer">“Free Soul Jai Ganesha Bhajan” · kalsstockmedia</a> · <a href="https://pixabay.com/service/license-summary/" target="_blank" rel="noopener noreferrer">Pixabay Content License</a></p>
   <a class="jump" id="replay-invitation" href="#top">Replay the opening</a>
 </footer>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a5ee86f3092f5135',t:'MTc5NTQxOTY0MA=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a5ee86f3092f5135',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</body>
 </html>
