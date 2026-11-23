@@ -404,3 +404,41 @@ html[lang="hi"] .cover-copy h2 { line-height:1.12 }
 @media (max-width: 690px) {
   .schedule-list .carousel { grid-template-columns: 1fr; }
 }
+
+.trailer-section {
+  padding: clamp(2.5rem, 6vw, 5.5rem) clamp(1rem, 4vw, 3rem);
+  text-align: center;
+  color: #fff4da;
+  background: radial-gradient(ellipse at top, #772b52, #301726 68%);
+}
+.trailer-section h2 { color: #ffe0a4; margin: 0 0 .45rem; }
+.trailer-section > p { margin: 0 0 1.1rem; }
+.trailer-section video {
+  display: block;
+  width: min(100%, 45rem);
+  height: auto;
+  margin: 0 auto;
+  border: 3px double #d9ac6a;
+  border-radius: .65rem;
+  background: #22151b;
+}
+.trailer-chapters {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: .45rem;
+  max-width: 49rem;
+  margin: 1rem auto 0;
+}
+.trailer-chapter {
+  min-height: 44px;
+  padding: .45rem .75rem;
+  border: 1px solid #c59165;
+  border-radius: 1.5rem;
+  background: #412538;
+  color: #fff4da;
+  font: inherit;
+  cursor: pointer;
+}
+.trailer-chapter[aria-current="true"] { background: #ffe0a4; color: #391a2c; }
+.trailer-chapter:focus-visible { outline: 2px solid #ffe0a4; outline-offset: 3px; }

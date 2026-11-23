@@ -398,6 +398,31 @@ for (const venue of wedding.venues) {
 }
 
 const music = document.querySelector('#wedding-music');
+const trailer = document.querySelector('#trailer-player');
+const chapters = document.querySelector('#trailer-chapters');
+const chapterDuration = 3;
+for (const [index, event] of wedding.events.entries()) {
+  const chapter = create('button', 'trailer-chapter', event.title);
+  chapter.type = 'button';
+  chapter.addEventListener('click', () => {
+    trailer.currentTime = index * chapterDuration;
+    trailer.play().catch(() => {});
+  });
+  chapters.append(chapter);
+}
+function syncTrailerChapter() {
+  const index = Math.min(wedding.events.length - 1, Math.floor(trailer.currentTime / chapterDuration));
+  for (const [position, chapter] of Array.from(chapters.children).entries()) {
+    chapter.setAttribute('aria-current', String(!trailer.paused && position === index));
+  }
+}
+trailer.addEventListener('play', () => {
+  music.pause();
+  syncTrailerChapter();
+});
+for (const event of ['timeupdate', 'pause', 'ended']) {
+  trailer.addEventListener(event, syncTrailerChapter);
+}
 const musicToggle = document.querySelector('#sound-toggle');
 function updateMusicButton() {
   musicToggle.setAttribute('aria-pressed', String(!music.paused));
@@ -409,6 +434,7 @@ music.addEventListener('play', updateMusicButton);
 music.addEventListener('pause', updateMusicButton);
 music.addEventListener('ended', updateMusicButton);
 function startBhajan() {
+  trailer.pause();
   music.play().catch(updateMusicButton);
 }
 musicToggle.addEventListener('click', () => {
