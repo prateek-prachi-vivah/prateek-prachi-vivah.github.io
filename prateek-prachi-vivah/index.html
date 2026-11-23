@@ -28,15 +28,19 @@
 <link rel="stylesheet" href="/styles.css">
 <link rel="stylesheet" href="/rajputana/theme.css">
 <link rel="stylesheet" href="/shubh-vivah/theme.css?v=33">
-<link rel="stylesheet" href="/darshan/theme.css?v=1">
-<script type="module" src="/shubh-vivah/invite.js?v=35"></script>
-<script type="module" src="/darshan/opening.js?v=1"></script>
-<link rel="preload" as="image" href="/darshan/ganesh.webp" fetchpriority="high">
+<link rel="stylesheet" href="/darshan/theme.css?v=2">
+<script type="module" src="/shubh-vivah/invite.js?v=36"></script>
+<script type="module" src="/darshan/opening.js?v=2"></script>
+<link rel="preload" as="image" href="/darshan/ganesh.webp" media="(min-width: 651px)" fetchpriority="high">
+<link rel="preload" as="image" href="/darshan/ganesh-mobile.webp" media="(max-width: 650px)" fetchpriority="high">
 <link rel="icon" href="/assets/wedding-arch.svg" type="image/svg+xml">
 <script>if (new URLSearchParams(location.search).get('lang') === 'en') location.replace('/prateek-prachi-vivah/english/' + location.search + location.hash)</script>
 </head>
 <body>
-<script>if (!matchMedia("(prefers-reduced-motion: reduce)").matches && (!location.hash || location.hash === "#top")) document.documentElement.classList.add("intro-open");</script>
+<script>if (!matchMedia("(prefers-reduced-motion: reduce)").matches && (!location.hash || location.hash === "#top")) {
+  document.documentElement.classList.add("intro-open");
+  window.invitationFallback = setTimeout(() => document.documentElement.classList.remove("intro-open"), 15500);
+}</script>
 <nav class="invite-tools" aria-label="निमंत्रण की भाषा">
   <a href="/prateek-prachi-vivah/english/" lang="en" hreflang="en">English</a>
   <button type="button" id="sound-toggle" aria-pressed="false">गणेश भजन चालू करें</button>
@@ -44,18 +48,15 @@
 <audio id="wedding-music" src="/shubh-vivah/ganesh-bhajan-soft.mp3" preload="none" loop></audio>
 <header id="top" class="intro" aria-label="श्री गणेशाय नमः">
   <div class="film" aria-hidden="true">
-    <img class="film-poster" src="/darshan/ganesh.webp" alt="" width="1024" height="1536" fetchpriority="high" decoding="async">
+    <div class="film-periphery"></div>
+    <picture class="film-poster-picture"><source media="(max-width: 650px)" srcset="/darshan/ganesh-mobile.webp"><img class="film-poster" src="/darshan/ganesh.webp" alt="" width="1024" height="1536" fetchpriority="high" decoding="async"></picture>
     <div class="film-scene" id="film-scene"></div>
   </div>
   <div class="intro-content">
     <p id="scene-caption" role="status" aria-live="polite">श्री गणेशाय नमः</p>
-    <div id="intro-actions">
-      <button type="button" id="cover-hint">भजन के साथ खोलें</button>
-      <button type="button" id="open-silent">बिना ध्वनि खोलें</button>
-    </div>
     <a class="intro-skip" id="skip-intro" href="#welcome">सीधे निमंत्रण पर जाएँ</a>
   </div>
-  <ol id="scene-list" hidden>
+  <ol id="scene-list" hidden data-gate-label="वैकुंठ · द्वार">
     <li data-art="ganesh" data-description="कमल पर विराजमान चार भुजाओं वाले श्री गणेश">श्री गणेशाय नमः</li>
     <li data-art="entry" data-description="वैकुंठ के नक्काशीदार द्वार">वैकुंठ के द्वार</li>
     <li data-art="hall" data-description="वैकुंठ का कमल मंडप">वैकुंठ धाम</li>
@@ -66,10 +67,16 @@
 <noscript><style>.intro-open{overflow:auto}.intro-open main,.intro-open footer{display:block}.intro{display:none!important}</style></noscript>
 <main>
   <section class="welcome scene" id="welcome" aria-labelledby="welcome-names">
+    <div class="welcome-veil" aria-hidden="true"></div>
     <figure class="welcome-art">
-      <img src="/darshan/mandap.webp" alt="दीपों और गेंदे के फूलों से सजा राजपूताना विवाह मंडप" width="1024" height="1536" loading="lazy" decoding="async">
+      <img src="/darshan/mandap.webp" srcset="/darshan/mandap-mobile.webp 760w, /darshan/mandap.webp 1024w" sizes="(max-width: 650px) 760px, 1024px" alt="दीपों और गेंदे के फूलों से सजा राजपूताना विवाह मंडप" width="1024" height="1536" loading="lazy" decoding="async">
     </figure>
-    <div class="welcome-card">
+    <div class="book-reveal">
+      <div class="book-jacket" aria-hidden="true">
+        <p lang="sa">श्री गणेशाय नमः</p>
+        <strong>शुभ विवाह</strong>
+      </div>
+      <div class="welcome-card">
       <p class="seal devanagari" lang="hi">ॐ</p>
       <p class="invocation devanagari" lang="sa">श्री गणेशाय नमः</p>
       <p class="narayana-invocation" lang="sa">ॐ नमो नारायणाय</p>
@@ -84,6 +91,7 @@
         <a class="jump" href="#schedule">विवाह के कार्यक्रम</a>
         <a class="jump" href="#venues">विवाह स्थल</a>
       </nav>
+      </div>
     </div>
   </section>
 
