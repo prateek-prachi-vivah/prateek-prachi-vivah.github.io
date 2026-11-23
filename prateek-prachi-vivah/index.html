@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<meta name="theme-color" content="#30191e">
+<meta name="theme-color" content="#191b2b">
 <meta name="description" content="उत्सव 30 नवंबर से 9 दिसंबर 2026 तक। मुख्य विवाह 9 दिसंबर को द पटेल लैंडमार्क गार्डन, कुरवाई में।">
 <meta property="og:title" content="प्रतीक और प्राची | विवाह निमंत्रण">
 <meta property="og:description" content="उत्सव 30 नवंबर से 9 दिसंबर 2026 तक। मुख्य विवाह 9 दिसंबर को द पटेल लैंडमार्क गार्डन, कुरवाई में।">
@@ -12,8 +12,8 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="शादी का निमंत्रण">
 <meta property="og:url" content="https://prateek-prachi-vivah.github.io/prateek-prachi-vivah/">
-<meta property="og:image" content="https://prateek-prachi-vivah.github.io/prateek-prachi-vivah/haveli-cover-share-hi.jpg">
-<meta property="og:image:secure_url" content="https://prateek-prachi-vivah.github.io/prateek-prachi-vivah/haveli-cover-share-hi.jpg">
+<meta property="og:image" content="https://prateek-prachi-vivah.github.io/prateek-prachi-vivah/vaikuntha-share-hi.jpg">
+<meta property="og:image:secure_url" content="https://prateek-prachi-vivah.github.io/prateek-prachi-vivah/vaikuntha-share-hi.jpg">
 <meta property="og:image:type" content="image/jpeg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -21,15 +21,19 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="प्रतीक और प्राची | विवाह निमंत्रण">
 <meta name="twitter:description" content="उत्सव 30 नवंबर से 9 दिसंबर 2026 तक। मुख्य विवाह 9 दिसंबर को द पटेल लैंडमार्क गार्डन, कुरवाई में।">
-<meta name="twitter:image" content="https://prateek-prachi-vivah.github.io/prateek-prachi-vivah/haveli-cover-share-hi.jpg">
+<meta name="twitter:image" content="https://prateek-prachi-vivah.github.io/prateek-prachi-vivah/vaikuntha-share-hi.jpg">
 <link rel="canonical" href="https://prateek-prachi-vivah.github.io/prateek-prachi-vivah/">
 <link rel="alternate" hreflang="en" href="https://prateek-prachi-vivah.github.io/prateek-prachi-vivah/english/">
 
 <link rel="stylesheet" href="/styles.css">
 <link rel="stylesheet" href="/rajputana/theme.css">
 <link rel="stylesheet" href="/shubh-vivah/theme.css?v=33">
-<script type="module" src="/shubh-vivah/invite.js?v=33"></script>
+<link rel="stylesheet" href="/vaikuntha/theme.css">
+<script type="module" src="/shubh-vivah/invite.js?v=34"></script>
+<script type="module" src="/vaikuntha/opening.js"></script>
+<link rel="preload" as="image" href="/vaikuntha/gate.webp" fetchpriority="high">
 <link rel="icon" href="/assets/wedding-arch.svg" type="image/svg+xml">
+<script>if (new URLSearchParams(location.search).get('lang') === 'en') location.replace('/prateek-prachi-vivah/english/' + location.search + location.hash)</script>
 </head>
 <body>
 <nav class="invite-tools" aria-label="निमंत्रण की भाषा">
@@ -37,40 +41,47 @@
   <button type="button" id="sound-toggle" aria-pressed="false">गणेश भजन सुनें</button>
 </nav>
 <audio id="wedding-music" src="/shubh-vivah/ganesh-bhajan-soft.mp3" preload="none" loop></audio>
-<a class="skip" href="#welcome">सीधे निमंत्रण पर जाएँ</a>
-<header class="cover scene" id="top">
-  <div class="cover-content">
-    <figure class="opening-arch">
-      <img src="/shubh-vivah/photos/haveli-entrance.webp" alt="सुनहरी मेहराब और फूलों से सजी राजपूताना हवेली" width="768" height="512" fetchpriority="high" decoding="async">
-    </figure>
-    <div class="cover-copy">
-      <p class="cover-kicker">शादी का निमंत्रण</p>
-      <h2><span class="groom-name">प्रतीक</span> <i>और</i> <span class="bride-name">प्राची</span></h2>
-      <div class="cover-rule" aria-hidden="true">✦</div>
-      <time datetime="2026-12-09">मुख्य विवाह · बुधवार, 9 दिसंबर 2026</time>
-      <p class="cover-celebrations">उत्सव · 30 नवंबर से 9 दिसंबर 2026</p>
-      <p class="cover-place">द पटेल लैंडमार्क गार्डन · कुरवाई</p>
+<header class="darshan-cover" id="top" aria-label="विवाह निमंत्रण की मंगलमय प्रस्तुति">
+  <div class="darshan-stage">
+    <div class="darshan-art" aria-hidden="true">
+      <div class="darshan-scene show" style="--art: url(/vaikuntha/gate.webp)"></div>
+      <div class="darshan-scene " style="--art: url(/vaikuntha/pavilion.webp)"></div>
+      <div class="darshan-scene " style="--art: url(/vaikuntha/narayan.webp)"></div>
+      <div class="darshan-scene " style="--art: url(/vaikuntha/ganesha.webp)"></div>
+      <div class="darshan-scene " style="--art: url(/vaikuntha/mandap.webp)"></div>
+      <div class="opening-doors"><i></i><i></i></div>
+      <video id="darshan-film" src="/vaikuntha/darshan.mp4" playsinline muted preload="none" disablepictureinpicture></video>
+      <div class="darshan-vignette"></div>
     </div>
-    <button type="button" class="opening-button" id="cover-hint" aria-controls="welcome">निमंत्रण खोलें</button>
+    <div class="darshan-frame" aria-hidden="true"></div>
+    <div class="darshan-caption">
+      <p data-scene-title>वैकुंठ के द्वार</p>
+      <p data-scene-title hidden>वैकुंठ धाम</p>
+      <p data-scene-title hidden>श्री लक्ष्मी-नारायण</p>
+      <p data-scene-title hidden>श्री गणेशाय नमः</p>
+      <p data-scene-title hidden>शुभ विवाह</p>
+    </div>
+    <div class="darshan-actions">
+      <button type="button" id="cover-hint" aria-controls="welcome">दर्शन आरंभ करें</button>
+      <a class="skip" href="#welcome">सीधे निमंत्रण पर जाएँ</a>
+    </div>
+    <div class="darshan-progress" aria-hidden="true"></div>
   </div>
 </header>
 <main>
   <section class="welcome scene" id="welcome" aria-labelledby="welcome-names">
     <figure class="welcome-art">
-      <img src="/rajputana/palace.webp" alt="सजी हुई मेहराब से झील और महल का चित्र" width="768" height="512" loading="lazy" decoding="async">
-      <figcaption>
-        <span class="haveli-ornament" aria-hidden="true">❦</span>
-        <strong>प्रतीक <i>और</i> प्राची</strong>
-        <time datetime="2026-12-09">9 दिसंबर 2026</time>
-      </figcaption>
+      <img src="/vaikuntha/mandap.webp" alt="दीपों और गेंदे के फूलों से सजा राजपूताना विवाह मंडप" width="900" height="1350" decoding="async">
     </figure>
     <div class="welcome-card">
       <p class="seal devanagari" lang="hi">ॐ</p>
+      <p class="narayana-invocation" lang="sa">ॐ नमो नारायणाय</p>
       <p class="invocation devanagari" lang="sa">श्री गणेशाय नमः</p>
       <p class="ganesh-verse devanagari" lang="sa">वक्रतुण्ड महाकाय सूर्यकोटि समप्रभ।<br>निर्विघ्नं कुरु मे देव सर्वकार्येषु सर्वदा॥</p>
       <p class="eyebrow">सपरिवार सादर आमंत्रण</p>
       <h1 id="welcome-names" tabindex="-1"><span class="groom-name">प्रतीक</span> <i>और</i> <span class="bride-name">प्राची</span></h1>
       <p class="invitation-line">हमारे शुभ विवाह में पधारकर इस अवसर की शोभा बढ़ाएँ।</p>
+      <p class="primary-date"><time datetime="2026-12-09">बुधवार, 9 दिसंबर 2026</time><span>द पटेल लैंडमार्क गार्डन · कुरवाई</span></p>
       <p class="wedding-range">30 नवंबर से 9 दिसंबर 2026</p>
       <nav class="invitation-links" aria-label="निमंत्रण के भाग">
         <a class="jump" href="#save-the-date">विवाह की तारीख</a>
@@ -142,7 +153,7 @@
   <p class="closing">आपके आगमन की प्रतीक्षा रहेगी।</p>
   <p><span class="groom-name">प्रतीक</span> <i>और</i> <span class="bride-name">प्राची</span></p>
   <p class="music-credit">भजन <a href="https://pixabay.com/music/religious-theme-free-soul-jai-ganesha-bhajan-399994/" target="_blank" rel="noopener noreferrer">“Free Soul Jai Ganesha Bhajan” · kalsstockmedia</a> · <a href="https://pixabay.com/service/license-summary/" target="_blank" rel="noopener noreferrer">Pixabay Content License</a></p>
-  <a class="jump" id="replay-invitation" href="#top">निमंत्रण फिर से खोलें</a>
+  <a class="jump" id="replay-invitation" href="#top">दर्शन फिर से देखें</a>
 </footer>
 </body>
 </html>

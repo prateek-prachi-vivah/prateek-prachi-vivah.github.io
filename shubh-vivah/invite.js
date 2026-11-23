@@ -53,91 +53,6 @@ function scatter(container) {
   }
 }
 
-const root = document.documentElement;
-const openingButton = document.querySelector('#cover-hint');
-const welcome = document.querySelector('#welcome');
-const content = [document.querySelector('main'), document.querySelector('footer')];
-let visitRecorded = false;
-function recordCardOpen() {
-  if (visitRecorded || navigator.globalPrivacyControl || navigator.doNotTrack === '1') return;
-  visitRecorded = true;
-  if (location.hostname.endsWith('.chatgpt.site')) {
-    fetch('/_card-open', { method: 'POST', keepalive: true }).catch(() => {});
-  }
-}
-let opening = false;
-
-function playOpeningChime() {
-  const AudioContext = window.AudioContext || window.webkitAudioContext;
-  if (!AudioContext) return;
-  try {
-    const context = new AudioContext();
-    const now = context.currentTime;
-    for (const [index, frequency] of [520, 782, 1046].entries()) {
-      const tone = context.createOscillator();
-      const gain = context.createGain();
-      const start = now + index * .095;
-      tone.type = 'sine';
-      tone.frequency.value = frequency;
-      gain.gain.setValueAtTime(.001, start);
-      gain.gain.exponentialRampToValueAtTime(.07, start + .016);
-      gain.gain.exponentialRampToValueAtTime(.001, start + .47);
-      tone.connect(gain).connect(context.destination);
-      tone.start(start);
-      tone.stop(start + .48);
-      if (index === 2) tone.addEventListener('ended', () => context.close().catch(() => {}));
-    }
-    context.resume().catch(() => context.close().catch(() => {}));
-  } catch {
-    // A blocked sound effect must never prevent the invitation from opening.
-  }
-}
-
-function closeCover() {
-  for (const element of content) element.inert = true;
-  root.classList.add('cover-closed');
-  window.scrollTo({ top: 0, behavior: 'instant' });
-}
-
-function openCover({ animate = true, focus = true } = {}) {
-  if (opening || !root.classList.contains('cover-closed')) return;
-  recordCardOpen();
-  if (focus && !soundOff) {
-    playOpeningChime();
-    if (music.paused) startBhajan();
-  }
-  const finish = () => {
-    root.classList.remove('cover-closed', 'cover-opening');
-    opening = false;
-    for (const element of content) element.inert = false;
-    if (focus && !motion.matches) {
-      welcome.animate([{ opacity: .65 }, { opacity: 1 }], { duration: 330, easing: 'ease-out' });
-    }
-    if (focus) document.querySelector('#welcome-names').focus({ preventScroll: true });
-  };
-  if (animate && !motion.matches) {
-    opening = true;
-    root.classList.add('cover-opening');
-    setTimeout(finish, 2150);
-  } else {
-    finish();
-  }
-}
-
-root.classList.add('invite-ready');
-if (!location.hash || location.hash === '#top') closeCover();
-else recordCardOpen();
-openingButton.addEventListener('click', () => openCover());
-document.querySelector('.skip').addEventListener('click', () =>
-  openCover({ animate: false, focus: false })
-);
-document.querySelector('#replay-invitation').addEventListener('click', event => {
-  event.preventDefault();
-  history.replaceState(null, '', location.pathname + location.search);
-  closeCover();
-  openingButton.focus({ preventScroll: true });
-});
-
 const weddingDate = dateFrom(wedding.date);
 for (const [id, format] of [
   ['wedding-weekday', { weekday: 'long' }],
@@ -417,30 +332,6 @@ for (const venue of wedding.venues) {
   card.append(controls);
   venueCards.append(card);
 }
-
-const music = document.querySelector('#wedding-music');
-const musicToggle = document.querySelector('#sound-toggle');
-let soundOff = false;
-function updateMusicButton() {
-  musicToggle.setAttribute('aria-pressed', String(!music.paused));
-  musicToggle.textContent = music.paused
-    ? (isHindi ? 'गणेश भजन सुनें' : 'Play Ganesh bhajan')
-    : (isHindi ? 'भजन रोकें' : 'Pause bhajan');
-}
-music.addEventListener('play', updateMusicButton);
-music.addEventListener('pause', updateMusicButton);
-music.addEventListener('ended', updateMusicButton);
-function startBhajan() {
-  music.play().catch(updateMusicButton);
-}
-musicToggle.addEventListener('click', () => {
-  soundOff = !music.paused;
-  if (music.paused) {
-    startBhajan();
-  } else {
-    music.pause();
-  }
-});
 
 if ('IntersectionObserver' in window && !motion.matches) {
   const reveal = new IntersectionObserver(entries => {
