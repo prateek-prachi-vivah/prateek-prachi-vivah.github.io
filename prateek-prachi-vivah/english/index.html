@@ -28,11 +28,10 @@
 <link rel="stylesheet" href="/styles.css">
 <link rel="stylesheet" href="/rajputana/theme.css">
 <link rel="stylesheet" href="/shubh-vivah/theme.css?v=53">
-<link rel="stylesheet" href="/darshan/theme.css?v=8">
-<script type="module" src="/shubh-vivah/invite.js?v=40"></script>
-<script type="module" src="/darshan/opening.js?v=8"></script>
-<link rel="preload" as="image" href="/darshan/ganesh.webp" media="(min-width: 651px)" fetchpriority="high">
-<link rel="preload" as="image" href="/darshan/ganesh-mobile.webp" media="(max-width: 650px)" fetchpriority="high">
+<link rel="stylesheet" href="/darshan/theme.css?v=9">
+<script type="module" src="/shubh-vivah/invite.js?v=41"></script>
+<script type="module" src="/darshan/opening.js?v=9"></script>
+<link rel="preload" as="image" href="/vaikuntha/ganesha.webp" fetchpriority="high">
 <link rel="icon" href="/assets/wedding-arch.svg" type="image/svg+xml">
 <script>if (new URLSearchParams(location.search).get('lang') === 'hi') location.replace('/prateek-prachi-vivah/' + location.search + location.hash)</script>
 </head>
@@ -46,10 +45,20 @@
   <button type="button" id="sound-toggle" aria-pressed="false">Play Ganesh bhajan</button>
 </nav>
 <audio id="wedding-music" src="/darshan/vaikuntha-flute.mp3" data-card-src="/shubh-vivah/ganesh-bhajan-soft.mp3" preload="auto" loop></audio>
+<script>
+(() => {
+  try { if (sessionStorage.getItem('wedding-audio-v2') === 'off') return; } catch {}
+  const track = document.getElementById('wedding-music');
+  if (!document.documentElement.classList.contains('intro-open')) return;
+  // Request the opening track before the animation modules finish loading.
+  track.volume = .75;
+  track.play().catch(() => {});
+})();
+</script>
 <header id="top" class="intro" aria-label="Shri Ganeshaya Namah">
   <div class="film" aria-hidden="true">
     <div class="film-periphery"></div>
-    <picture class="film-poster-picture"><source media="(max-width: 650px)" srcset="/darshan/ganesh-mobile.webp"><img class="film-poster" src="/darshan/ganesh.webp" alt="" width="1024" height="1536" fetchpriority="high" decoding="async"></picture>
+    <img class="film-poster" src="/vaikuntha/ganesha.webp" alt="" width="900" height="1350" fetchpriority="high" decoding="async">
     <div class="film-scene" id="film-scene"></div>
   </div>
   <div class="intro-content">
