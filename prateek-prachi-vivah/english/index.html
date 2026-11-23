@@ -28,11 +28,11 @@
 <link rel="stylesheet" href="/styles.css">
 <link rel="stylesheet" href="/rajputana/theme.css">
 <link rel="stylesheet" href="/shubh-vivah/theme.css?v=53">
-<link rel="stylesheet" href="/darshan/theme.css?v=6">
-<script type="module" src="/shubh-vivah/invite.js?v=38"></script>
-<script type="module" src="/darshan/opening.js?v=6"></script>
-<link rel="preload" as="image" href="/darshan/ganesh-temple.webp" media="(min-width: 651px)" fetchpriority="high">
-<link rel="preload" as="image" href="/darshan/ganesh-temple-mobile.webp" media="(max-width: 650px)" fetchpriority="high">
+<link rel="stylesheet" href="/darshan/theme.css?v=7">
+<script type="module" src="/shubh-vivah/invite.js?v=39"></script>
+<script type="module" src="/darshan/opening.js?v=7"></script>
+<link rel="preload" as="image" href="/darshan/ganesh.webp" media="(min-width: 651px)" fetchpriority="high">
+<link rel="preload" as="image" href="/darshan/ganesh-mobile.webp" media="(max-width: 650px)" fetchpriority="high">
 <link rel="icon" href="/assets/wedding-arch.svg" type="image/svg+xml">
 <script>if (new URLSearchParams(location.search).get('lang') === 'hi') location.replace('/prateek-prachi-vivah/' + location.search + location.hash)</script>
 </head>
@@ -45,11 +45,11 @@
   <a href="/prateek-prachi-vivah/" lang="hi" hreflang="hi">हिंदी</a>
   <button type="button" id="sound-toggle" aria-pressed="false">Play Ganesh bhajan</button>
 </nav>
-<audio id="wedding-music" src="/shubh-vivah/ganesh-bhajan-soft.mp3" preload="none" loop></audio>
+<audio id="wedding-music" src="/darshan/vaikuntha-flute.mp3" data-card-src="/shubh-vivah/ganesh-bhajan-soft.mp3" preload="auto" loop></audio>
 <header id="top" class="intro" aria-label="Shri Ganeshaya Namah">
   <div class="film" aria-hidden="true">
     <div class="film-periphery"></div>
-    <picture class="film-poster-picture"><source media="(max-width: 650px)" srcset="/darshan/ganesh-temple-mobile.webp"><img class="film-poster" src="/darshan/ganesh-temple.webp" alt="" width="1024" height="1536" fetchpriority="high" decoding="async"></picture>
+    <picture class="film-poster-picture"><source media="(max-width: 650px)" srcset="/darshan/ganesh-mobile.webp"><img class="film-poster" src="/darshan/ganesh.webp" alt="" width="1024" height="1536" fetchpriority="high" decoding="async"></picture>
     <div class="film-scene" id="film-scene"></div>
   </div>
   <div class="intro-content">
@@ -61,7 +61,6 @@
     <li data-art="entry" data-description="Carved gates of Vaikuntha">The Gates of Vaikuntha</li>
     <li data-art="hall" data-description="The lotus pavilion of Vaikuntha">Vaikuntha Dham</li>
     <li data-art="vishnu" data-description="Lakshmi and four-armed Vishnu enthroned beneath Shesha">Shri Lakshmi Narayana</li>
-    <li data-art="mandap" data-description="Rajputana wedding mandap">The Sacred Wedding</li>
   </ol>
 </header>
 <noscript><style>.intro-open{overflow:auto}.intro-open main,.intro-open footer{display:block}.intro{display:none!important}</style></noscript>
