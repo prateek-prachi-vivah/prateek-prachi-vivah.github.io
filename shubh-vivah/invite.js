@@ -40,19 +40,6 @@ function create(tag, className, content) {
 for (const element of document.querySelectorAll('.groom-name')) element.textContent = wedding.groom;
 for (const element of document.querySelectorAll('.bride-name')) element.textContent = wedding.bride;
 
-function scatter(container) {
-  if (motion.matches) return;
-  for (let index = 0; index < 7; index++) {
-    const petal = create('i', 'petal');
-    const edge = index % 2 ? 82 : 6;
-    petal.style.setProperty('--x', edge + Math.round(Math.random() * 12) + '%');
-    petal.style.setProperty('--drift', Math.round(Math.random() * 160 - 80) + 'px');
-    petal.style.animationDelay = index * 42 + 'ms';
-    petal.addEventListener('animationend', () => petal.remove(), { once: true });
-    container.append(petal);
-  }
-}
-
 const weddingDate = dateFrom(wedding.date);
 for (const [id, format] of [
   ['wedding-weekday', { weekday: 'long' }],
@@ -99,11 +86,12 @@ function revealDate() {
   paperWindow.setAttribute('aria-hidden', 'false');
   tassel.setAttribute('aria-expanded', 'true');
   tassel.setAttribute('aria-label', text.revealed);
+  document.querySelector('#save-title').textContent = isHindi ? 'मुख्य विवाह की तारीख' : 'Main wedding date';
   document.querySelector('#date-hint').hidden = true;
   document.querySelector('#date-extras').hidden = false;
   countdownTimer = setInterval(updateCountdown, 1000);
   updateCountdown();
-  scatter(document.querySelector('#date-petals'));
+  document.dispatchEvent(new Event('invitation-date-revealed'));
 }
 
 tassel.addEventListener('click', event => {
@@ -192,6 +180,9 @@ scheduleView.addEventListener('click', () => {
   listView = !listView;
   schedule.classList.toggle('schedule-list', listView);
   scheduleView.setAttribute('aria-pressed', String(listView));
+  scheduleView.textContent = listView
+    ? (isHindi ? 'समारोह एक-एक करके देखें' : 'View celebrations one at a time')
+    : (isHindi ? 'सभी समारोह एक साथ देखें' : 'View all celebrations');
   swipeHint.hidden = listView;
   if (!listView) {
     const card = cards[active];
@@ -210,6 +201,11 @@ function announceCard() {
   cards[active].classList.add('entering');
   announced = active;
   currentEvent.textContent = wedding.events[active].title;
+  const selected = dots.children[active];
+  const left = selected.offsetLeft - dots.offsetLeft;
+  if (left < dots.scrollLeft || left + selected.offsetWidth > dots.scrollLeft + dots.clientWidth) {
+    dots.scrollTo({ left: left - (dots.clientWidth - selected.offsetWidth) / 2, behavior: behavior() });
+  }
 }
 function selectCard(index) {
   if (active === index) return;
@@ -279,7 +275,7 @@ for (const venue of wedding.venues) {
   card.append(create('p', 'eyebrow', venue.occasion), create('h3', '', venue.name), create('p', '', venue.address));
   const controls = create('div', 'map-controls');
   const getDirections = create('a', 'button', isHindi ? 'Google Maps से रास्ता' : 'Google Maps directions');
-  getDirections.href = mapsLink('dir', { destination: venue.directionsDestination || venue.coordinates });
+  getDirections.href = mapsLink('dir', { destination: venue.coordinates });
   getDirections.target = '_blank';
   getDirections.rel = 'noopener noreferrer';
   getDirections.setAttribute('aria-label', text.directionsTo(venue.name));
