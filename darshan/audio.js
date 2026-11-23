@@ -210,10 +210,7 @@ export function weddingAudio({ source, control, hindi, isCardOpen }) {
   document.addEventListener('click', activateOnInteraction, { capture: true });
   show();
   return {
-    prepare() {
-      if (active || permitted) usePhase(0, true);
-      else if (preference !== 'off') { phase = 0; play({ fresh: true }); }
-    },
+    prepare() { usePhase(0, true); },
     startCard() { usePhase(1, true); },
     cue
   };
