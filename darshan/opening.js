@@ -1,4 +1,4 @@
-import { weddingAudio } from './audio.js?v=3';
+import { weddingAudio } from './audio.js?v=5';
 
 const root = document.documentElement;
 const intro = document.querySelector('#top');
@@ -26,9 +26,9 @@ const audio = weddingAudio({
 clearTimeout(window.invitationFallback);
 
 function artUrl(name) {
-  const smallScene = name === 'entry' || name === 'hall' || name === 'vishnu' || name === 'mandap';
+  const smallScene = name === 'entry' || name === 'hall' || name === 'mandap';
   const asset = smallScene && matchMedia('(max-width: 650px)').matches ? name + '-mobile' : name;
-  return new URL(asset + '.webp', import.meta.url).href;
+  return new URL((name === 'vishnu' ? 'narayana-sculptural' : asset) + '.webp', import.meta.url).href;
 }
 
 function load(name) {
@@ -128,13 +128,13 @@ async function play() {
   caption.textContent = scenes.ganesh.textContent;
   intro.setAttribute('aria-label', scenes.ganesh.dataset.description);
   audio.prepare();
-  hardStop = setTimeout(() => reveal({ cinematic: true }), 16300);
+  hardStop = setTimeout(() => reveal({ cinematic: true }), 11200);
   load('entry');
   load('hall');
   load('vishnu');
   // The poster is already visible. Downloads enhance later frames and cannot delay the first one.
   for (let number = 2; number <= 7; number++) load('door-' + number);
-  await wait(1700);
+  await wait(1150);
   if (token !== run) return;
   for (let number = 1; number <= 7; number++) {
     const name = number === 1 ? 'entry' : 'door-' + number;
@@ -148,11 +148,11 @@ async function play() {
       caption.textContent = sceneList.dataset.gateLabel + ' ' + number + ' / 7';
       audio.cue(number === 7 ? 'sanctum' : 'door');
     }
-    await wait(number === 7 ? 1180 : 910);
+    await wait(number === 7 ? 890 : 620);
     if (token !== run) return;
   }
 
-  for (const [name, duration] of [['vishnu', 2400], ['mandap', 1000]]) {
+  for (const [name, duration] of [['vishnu', 1900], ['mandap', 650]]) {
     const image = await getArt(name, 500);
     if (token !== run) return;
     if (!image) continue;
@@ -191,6 +191,7 @@ motion.addEventListener('change', event => {
 if (opened) {
   intro.hidden = true;
   document.body.classList.add('card-visible');
+  audio.startCard();
   if (location.hash) requestAnimationFrame(() => document.getElementById(location.hash.slice(1))?.scrollIntoView());
 } else {
   play();
