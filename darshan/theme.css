@@ -20,7 +20,7 @@ html[lang="hi"] { --serif: 'Noto Invitation', 'Noto Serif Devanagari', 'Nirmala 
 body { background: #f7e8d0; }
 .intro-open { overflow: hidden; }
 .intro-open main, .intro-open footer { display: none; }
-html:not(.intro-open) .intro { display: none; }
+html:not(.intro-open) .intro:not(.is-dissolving), .intro[hidden] { display: none; }
 .intro {
   position: fixed;
   inset: 0;
@@ -443,8 +443,15 @@ footer :is(.seal,.eyebrow,.closing,.jump,a) { color: var(--light); }
   filter: saturate(.77) brightness(.55);
   background-image: linear-gradient(#231c2cd9,#543423d9 48%,#231c2cf0), var(--frame-photo, url('./ganesh.webp'));
 }
-.film-shot { animation: scene-join .27s ease-out both; }
-@keyframes scene-join { from { opacity: .12; } to { opacity: 1; } }
+html:not(.intro-open) .intro.is-dissolving:not([hidden]) {
+  pointer-events: none;
+  animation: darshan-dissolve .48s ease-in-out both;
+}
+@keyframes darshan-dissolve {
+  to { opacity: 0; }
+}
+.film-shot { animation: scene-join .42s ease-out both; }
+@keyframes scene-join { from { opacity: 0; } to { opacity: 1; } }
 @keyframes sacred-appear { from { opacity: .8; } to { opacity: 1; } }
 
 .portal {
@@ -604,7 +611,6 @@ footer :is(.seal,.eyebrow,.closing,.jump,a) { color: var(--light); }
 @media (max-width: 650px) and (orientation: portrait) {
   .film-shot[data-gate]:not([data-gate="1"]) .portal { width: min(182vw, 94svh); }
 }
-.film:has(.film-shot) .film-poster { visibility: hidden; }
 
 .film-shot[data-shot="vishnu"] {
   --frame-photo: url('./narayana-sculptural.webp');
@@ -620,6 +626,7 @@ footer :is(.seal,.eyebrow,.closing,.jump,a) { color: var(--light); }
 }
 @media (prefers-reduced-motion: reduce) {
   .film-shot[data-shot="vishnu"] > img, .film-shot[data-gate] .portal-leaf { animation: none; }
+  html:not(.intro-open) .intro.is-dissolving { display: none; }
 }
 
 .film-periphery { --frame-photo: url('./ganesh-mobile.webp'); }
