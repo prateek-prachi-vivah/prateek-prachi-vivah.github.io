@@ -127,7 +127,68 @@ function openCover({ animate = true, focus = true } = {}) {
 root.classList.add('invite-ready');
 if (!location.hash || location.hash === '#top') closeCover();
 else recordCardOpen();
-openingButton.addEventListener('click', () => openCover());
+const blessings = isHindi ? [
+  ['श्री गणेश', 'मंगल आरंभ के लिए दीप जलाएँ', 'दीप जलाएँ'],
+  ['श्री विष्णु', 'भगवान विष्णु को पुष्प अर्पित करें', 'पुष्प चढ़ाएँ'],
+  ['माँ लक्ष्मी', 'माँ लक्ष्मी के चरणों में कमल अर्पित करें', 'कमल अर्पित करें']
+] : [
+  ['Shri Ganesh', 'Light a diya for an auspicious beginning', 'Light the diya'],
+  ['Shri Vishnu', 'Offer a flower to Lord Vishnu', 'Offer a flower'],
+  ['Maa Lakshmi', 'Offer a lotus at the feet of Maa Lakshmi', 'Offer a lotus']
+];
+const emblems = [
+  '<path d="M18 55 Q50 67 82 55 Q74 79 50 79 Q27 79 18 55Z M45 80h10m-15 5h20"/><path fill="#ffd58b" d="M50 54C34 47 51 38 53 20c12 18 12 29-3 34Z"/>',
+  '<path d="M27 63c-13-18-1-40 18-43 19-4 37 9 35 26-1 15-15 23-28 21l-17 15-11-10 12-13 M44 49c-10-12 7-24 15-14 6 8-2 16-8 11 M30 69l9 8"/>',
+  '<path d="M50 73C33 63 35 43 50 25 65 43 67 63 50 73Z M48 74C27 73 18 59 17 41c17 3 26 14 31 33Zm4 0c21-1 30-15 31-33-17 3-26 14-31 33Z M17 56l-9-2c6 17 21 25 42 23 21 2 36-6 42-23l-9 2"/>'
+];
+const shrine = create('dialog', 'blessing-panel');
+shrine.setAttribute('aria-labelledby','blessing-title');
+shrine.innerHTML = '<div class="blessing-inner"><p class="blessing-count"></p><svg aria-hidden="true" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"></svg><h2 id="blessing-title"></h2><p class="blessing-message"></p><button class="blessing-act" type="button"></button><button class="blessing-skip" type="button"></button></div>';
+document.body.append(shrine);
+const blessingCSS = create('style');
+blessingCSS.textContent = `
+.blessing-panel{box-sizing:border-box;width:min(90vw,28rem);max-height:88dvh;padding:9px;border:1px solid #dcc096;border-radius:48% 48% 8px 8px / 19% 19% 8px 8px;color:#fff4dd;background:radial-gradient(ellipse at top,#863b47,#491727 61%,#32131e);text-align:center;box-shadow:0 20px 80px #1f0b1890}
+.blessing-panel::backdrop{background:#211017dc}
+.blessing-inner{border:1px solid #c39e68;border-radius:inherit;padding:clamp(24px,7vw,42px) 14px 18px;background:radial-gradient(ellipse at 50% 25%,#dfaa5624,transparent 42%)}
+.blessing-panel svg{width:clamp(78px,23vw,110px);color:#ffdb91;border:1px solid #c99d60;border-radius:50%;background:#401522}
+.blessing-panel h2{font:normal clamp(30px,8vw,48px)/1.3 Georgia,serif;color:#ffe7b6;margin:12px 0 6px}
+.blessing-panel p{font-size:17px;line-height:1.5;color:#fff0d6;margin:10px auto 18px}
+.blessing-panel button{display:block;margin:8px auto 0;min-height:44px;font-size:16px;cursor:pointer}
+.blessing-act{color:#401522;background:#f5dfb1;border:1px solid #d9ae70;border-radius:4px;padding:8px 24px}
+.blessing-skip{background:transparent;color:#fff0db;text-decoration:underline;border:0}
+`;
+document.head.append(blessingCSS);
+let blessingStep = 0;
+const action = shrine.querySelector('.blessing-act');
+function showBlessing() {
+  const [name, message, label] = blessings[blessingStep];
+  shrine.querySelector('svg').innerHTML = emblems[blessingStep];
+  shrine.querySelector('h2').textContent = name;
+  shrine.querySelector('.blessing-count').textContent = (isHindi ? 'मंगल वंदना' : 'Wedding blessings') + ' · ' + (blessingStep + 1) + ' / 3';
+  shrine.querySelector('.blessing-message').textContent = message;
+  action.textContent = label;
+  action.setAttribute('aria-label', name + ' · ' + label);
+  if (!motion.matches && shrine.open) shrine.querySelector('svg').animate([{opacity:.4,transform:'scale(.94)'},{opacity:1,transform:'scale(1)'}],{duration:380});
+}
+function finishBlessings() {
+  shrine.close();
+  openCover();
+}
+shrine.querySelector('.blessing-inner').setAttribute('aria-live','polite');
+shrine.querySelector('.blessing-skip').textContent = isHindi ? 'सीधे निमंत्रण खोलें' : 'Open invitation directly';
+shrine.querySelector('.blessing-skip').addEventListener('click',finishBlessings);
+action.addEventListener('click', () => {
+  if (++blessingStep === blessings.length) finishBlessings();
+  else showBlessing();
+});
+openingButton.addEventListener('click', () => {
+  if (typeof shrine.showModal !== 'function') { openCover(); return; }
+  blessingStep = 0;
+  showBlessing();
+  shrine.showModal();
+  action.focus();
+  if (!soundOff && music.paused) startBhajan();
+});
 document.querySelector('.skip').addEventListener('click', () =>
   openCover({ animate: false, focus: false })
 );
