@@ -809,3 +809,45 @@ html:not(.intro-open) .intro.is-dissolving:not([hidden]) {
 .venues, .date-section { background: linear-gradient(120deg, #f8e7bf, #fff3dc 45%, #f6e2b6); }
 .schedule .event-card, .venues .venue-card { border-bottom-color: #a57736; }
 footer { background: linear-gradient(135deg, #283d31, #2f2822); }
+
+#open-invitation { background: #f3d6a1; color: #492a26; cursor: pointer; padding-inline: 1.5rem; }
+#open-invitation[hidden] { display: none; }
+.intro-content { pointer-events: auto; }
+footer { position: relative; isolation: isolate; }
+.diya-dust {
+  position: absolute; inset: 4%; pointer-events: none; z-index: 1;
+  background: radial-gradient(circle at 12% 74%, #f2bf7788 0 1px, transparent 3px),
+    radial-gradient(circle at 81% 38%, #f8d48baa 0 1px, transparent 3px),
+    radial-gradient(circle at 63% 16%, #ffe3a599 0 1px, transparent 3px),
+    radial-gradient(circle at 23% 33%, #f6d5a488 0 2px, transparent 4px);
+}
+.welcome .book-reveal, .intro .intro-content { z-index: 2; }
+.welcome #welcome-names { color: #805528; text-shadow: 0 1px #fff5cd, 0 2px #a8794955; overflow-wrap: anywhere; }
+.event-calendar { display: flex; flex-wrap: wrap; gap: .6rem; }
+.event-calendar a, footer .jump { min-height: 44px; display: inline-flex; align-items: center; }
+.venue-meta, .event-body { overflow-wrap: anywhere; }
+@keyframes diya-drift { from { opacity: .3; transform: translate3d(-2px,5px,0); } to { opacity: .85; transform: translate3d(3px,-6px,0); } }
+@keyframes cord-settle { 30% { transform: rotate(-5deg); } 60% { transform: rotate(3deg); } }
+@keyframes paper-lift { from { transform: perspective(700px) rotateX(-16deg); } }
+@keyframes pin-drop { from { transform: translateY(-12px) scale(.9); opacity: .3; } }
+@media (prefers-reduced-motion: no-preference) {
+  html:not(.light-motion) .diya-dust { animation: diya-drift 3.6s ease-in-out infinite alternate; }
+  html:not(.light-motion) .welcome-art img { transform: translateY(var(--drift,0px)) scale(1.035); }
+  html:not(.light-motion) .welcome #welcome-names { transform: perspective(650px) rotateY(var(--tilt,0deg)); }
+  html:not(.light-motion) .schedule:not(.schedule-list) .event-card { transform: perspective(900px) rotateY(var(--fan,0deg)) scale(.95); transition: transform .38s cubic-bezier(.2,.7,.25,1); }
+  html:not(.light-motion) .schedule:not(.schedule-list) .event-card.active { transform: perspective(900px) rotateY(0) scale(1); }
+  html:not(.light-motion) .scroll.revealed .tassel-art { transform-origin: top; animation: cord-settle .66s ease-out; }
+  html:not(.light-motion) .scroll.revealed .date-paper { transform-origin: top; animation: paper-lift .5s ease-out; }
+  html:not(.light-motion) .venues.in-view .venue-meta h3::before { content: '◆'; display: inline-block; color: var(--gold); font-size: .52em; margin-inline-end: .5em; animation: pin-drop .6s ease-out; }
+}
+@media (max-width: 899px) { html:not(.light-motion) .welcome-art img { transform: none; } }
+@media (prefers-reduced-motion: no-preference) {
+  html:not(.light-motion) .dragging .tassel-art { transform: translateY(var(--pull,0px)) rotate(2deg); }
+  html:not(.light-motion) .event-card.entering .event-art { animation: miniature-arrival .65s ease-out; }
+  #celebration-1,#celebration-6 { --art-origin: 38% 55%; }
+  #celebration-2,#celebration-4 { --art-origin: 66% 45%; }
+  #celebration-3,#celebration-5 { --art-origin: 48% 65%; }
+  #celebration-7 { --art-origin: 26% 45%; }
+}
+@keyframes miniature-arrival { from { transform-origin: var(--art-origin); transform: scale(1.035); } }
+.light-motion .film *, .light-motion .book-reveal *, .light-motion .diya-dust { animation-duration: .01s !important; }

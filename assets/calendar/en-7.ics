@@ -1,0 +1,12 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Prateek Prachi//Invitation//EN
+BEGIN:VEVENT
+UID:event-7@prateek-prachi-vivah.github.io
+DTSTAMP:20261124T000000Z
+DTSTART:20261209T133000Z
+SUMMARY:Baraat
+DESCRIPTION:7:00 PM onwards
+LOCATION:The Patel Landmark Garden\, Kurwai\, Madhya Pradesh
+END:VEVENT
+END:VCALENDAR

@@ -11,8 +11,9 @@ export function weddingAudio({ source, control, hindi, isCardOpen }) {
     play: ['Play Vaikuntha music', 'Play Ganesh bhajan'],
     pause: 'Pause music', waiting: 'Loading sound', retry: 'Retry sound'
   };
+  let unlocked = false;
   let preference;
-  try { preference = sessionStorage.getItem(preferenceKey); } catch {}
+  try { preference = localStorage.getItem(preferenceKey); } catch {}
   let phase = Number(isCardOpen());
   let playingPhase = !source.paused && source.src === tracks[phase] ? phase : null;
   let context, music, chimes;
@@ -31,7 +32,7 @@ export function weddingAudio({ source, control, hindi, isCardOpen }) {
 
   function remember(value) {
     preference = value;
-    try { sessionStorage.setItem(preferenceKey, value); } catch {}
+    try { localStorage.setItem(preferenceKey, value); } catch {}
   }
 
   // Keep the same authorized HTML audio element for both tracks. Attach the mixer
@@ -77,7 +78,7 @@ export function weddingAudio({ source, control, hindi, isCardOpen }) {
   }
 
   async function play({ gesture = false, fresh = false } = {}) {
-    if (preference === 'off' || document.hidden) return;
+    if (!unlocked || preference === 'off' || document.hidden) return;
     const token = ++generation;
     const index = phase;
     const changing = source.src !== tracks[index] && !source.paused;
@@ -103,15 +104,16 @@ export function weddingAudio({ source, control, hindi, isCardOpen }) {
       if (fresh) {
         try { source.currentTime = 0; } catch {}
       }
-      if (music) setGain(changing ? 0 : 1, .01);
+      if (music) setGain(changing || fresh ? .001 : .8, .01);
       source.loop = true;
       // Directly within the button handler when browser activation is required.
       await source.play();
       if (token !== generation || preference === 'off' || document.hidden) return;
       playingPhase = index;
+      if (fresh || gesture) cue(index ? 'paper' : 'bell');
       if (changing && !music && source.volume < .95) nativeRamp(source.volume, 1, token);
       else source.volume = 1;
-      if (music) setGain(1);
+      if (music) setGain(.8);
       if (!gesture) enableMixer();
     } catch (error) {
       if (token === generation) {
@@ -141,19 +143,25 @@ export function weddingAudio({ source, control, hindi, isCardOpen }) {
     if (preference === 'off' || source.paused || document.hidden ||
         !chimes || context.state !== 'running') return;
     const now = context.currentTime;
-    const length = kind === 'sanctum' ? .64 : .39;
-    const tone = tones[kind];
-    if (playingPhase === 0) {
+    const length = ({ tap: .09, tick: .07, swipe: .13, paper: .21, bell: .82, finale: .76, sanctum: .64 })[kind] || .39;
+    const tone = tones[kind] || { bell: 440, paper: 145, swipe: 175, tap: 660, finale: 784, tick: 320 }[kind];
+    if (!tone) return;
+    if (music) {
       setGain(.62, .012);
       music.gain.setValueAtTime(.62, now + .07);
-      music.gain.linearRampToValueAtTime(1, now + .20);
+      music.gain.linearRampToValueAtTime(.8, now + .20);
     }
     for (const [index, multiple] of [1, 1.99, 2.42].entries()) {
       const note = context.createOscillator();
       const envelope = context.createGain();
-      note.frequency.value = tone * multiple;
+      const airy = ['door','swipe','paper'].includes(kind);
+      note.type = airy ? 'triangle' : 'sine';
+      note.frequency.setValueAtTime(tone * multiple, now);
+      if (airy) note.frequency.exponentialRampToValueAtTime(tone * multiple * .34, now + length);
+      if (kind === 'darshan' || kind === 'finale') note.frequency.setValueAtTime(tone * [1,1.25,1.5][index], now);
+
       envelope.gain.setValueAtTime(.0001, now);
-      envelope.gain.exponentialRampToValueAtTime(.064 / (index + 1), now + .009);
+      envelope.gain.exponentialRampToValueAtTime(.036 / (index + 1), now + .009);
       envelope.gain.exponentialRampToValueAtTime(.0001, now + length);
       note.connect(envelope).connect(chimes);
       liveChimes.add(note);
@@ -163,19 +171,9 @@ export function weddingAudio({ source, control, hindi, isCardOpen }) {
     }
   }
 
-  // When autoplay is blocked, any ordinary interaction can unlock the current
-  // track. An explicit pause always takes precedence.
-  function resumeOnInteraction(event) {
-    if (!event.isTrusted || control.contains(event.target) || preference === 'off' ||
-        document.hidden || !source.paused || loading) return;
-    play({ gesture: true });
-  }
-  document.addEventListener('click', resumeOnInteraction);
-  document.addEventListener('keydown', resumeOnInteraction);
-
   control.addEventListener('click', () => {
     if (!source.paused || (loading && preference === 'on')) { remember('off'); stop(); }
-    else { remember('on'); play({ gesture: true }); }
+    else { unlocked = true; remember('on'); play({ gesture: true }); }
   });
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) stop();
@@ -183,6 +181,10 @@ export function weddingAudio({ source, control, hindi, isCardOpen }) {
   });
   show();
   return {
+    unlock() {
+      unlocked = true;
+      if (preference !== 'off') enableMixer();
+    },
     prepare() {
       phase = 0;
       if (preference !== 'off' && playingPhase === 0 && !source.paused) enableMixer();

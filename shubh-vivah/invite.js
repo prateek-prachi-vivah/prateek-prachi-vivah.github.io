@@ -80,6 +80,7 @@ function updateCountdown() {
 function revealDate() {
   if (revealed) return;
   revealed = true;
+  tassel.style.removeProperty('--pull');
   scroll.classList.remove('dragging');
   scroll.classList.add('revealed');
   paperWindow.style.height = '';
@@ -110,12 +111,14 @@ tassel.addEventListener('pointermove', event => {
   if (pullStart === null || event.pointerId !== pointerId) return;
   progress = Math.min(paper.offsetHeight, Math.max(0, event.clientY - pullStart));
   suppressPointerClick ||= Math.abs(event.clientY - pullStart) > 8;
+  tassel.style.setProperty('--pull', Math.min(14, Math.sqrt(progress) * 1.4) + 'px');
   paperWindow.style.height = progress + 'px';
 });
 function finishPull(event) {
   if (pullStart === null || event.pointerId !== pointerId) return;
   pullStart = null;
   pointerId = null;
+  tassel.style.removeProperty('--pull');
   scroll.classList.remove('dragging');
   if (event.type === 'pointerup' && progress >= 45) revealDate();
   else paperWindow.style.height = '';
@@ -176,6 +179,21 @@ for (const [index, event] of wedding.events.entries()) {
   if (event.note) body.append(create('p', 'event-note', event.note));
   const frame = create('div', 'event-art-frame');
   frame.append(art);
+  const actions = create('div', 'event-calendar');
+  const calendar = create('a', 'jump', isHindi ? 'Google कैलेंडर' : 'Google Calendar');
+  const file = create('a', 'jump', isHindi ? 'कैलेंडर फ़ाइल' : 'Calendar file');
+  const [start, end] = [['1600'],['1000','1200'],['1600','1800'],['2100','2300'],['0800','1000'],['1200','1500'],['1900']][index];
+  const stamp = event.date.replaceAll('-', '') + 'T';
+  const query = new URLSearchParams({ action: 'TEMPLATE', text: event.title, ctz: 'Asia/Kolkata',
+    dates: stamp + start + '00/' + stamp + (end || start) + '00', details: event.time });
+  if (event.venue) query.set('location', event.venue);
+  calendar.href = 'https://calendar.google.com/calendar/render?' + query;
+  calendar.target = '_blank';
+  calendar.rel = 'noopener noreferrer';
+  file.href = '/assets/calendar/' + (isHindi ? 'hi' : 'en') + '-' + (index + 1) + '.ics';
+  file.download = '';
+  actions.append(calendar, file);
+  body.append(actions);
   card.append(frame, body);
   carousel.append(card);
   const dot = create('button', 'dot');
@@ -229,8 +247,10 @@ function announceCard() {
 }
 function selectCard(index) {
   if (active === index) return;
+  if (active >= 0) document.dispatchEvent(new CustomEvent('invitation-sound', { detail: 'swipe' }));
   active = index;
   for (const [position, card] of cards.entries()) {
+    card.style.setProperty('--fan', (Math.sign(index - position) * 11) + 'deg');
     card.classList.toggle('active', position === index);
     dots.children[position].setAttribute('aria-current', position === index ? 'true' : 'false');
   }

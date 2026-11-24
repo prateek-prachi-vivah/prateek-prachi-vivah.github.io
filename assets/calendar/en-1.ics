@@ -1,0 +1,12 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Prateek Prachi//Invitation//EN
+BEGIN:VEVENT
+UID:event-1@prateek-prachi-vivah.github.io
+DTSTAMP:20261124T000000Z
+DTSTART:20261130T103000Z
+SUMMARY:Godi Bharai\, Tilak & Sagai
+DESCRIPTION:4:00 PM onwards
+LOCATION:Royal Celebrations Club & Hotel\, Bhopal
+END:VEVENT
+END:VCALENDAR

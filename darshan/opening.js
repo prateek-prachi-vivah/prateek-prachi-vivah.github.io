@@ -1,10 +1,12 @@
-import { weddingAudio } from './audio.js?v=13';
+import './motion.js?v=15';
+import { weddingAudio } from './audio.js?v=15';
 
 const root = document.documentElement;
 const intro = document.querySelector('#top');
 const stage = document.querySelector('#film-scene');
 const caption = document.querySelector('#scene-caption');
 const skip = document.querySelector('#skip-intro');
+const opener = document.querySelector('#open-invitation');
 const main = document.querySelector('main');
 const footer = document.querySelector('footer');
 const welcome = document.querySelector('#welcome');
@@ -137,6 +139,7 @@ async function play() {
   stage.replaceChildren();
   caption.textContent = scenes.ganesh.textContent;
   intro.setAttribute('aria-label', scenes.ganesh.dataset.description);
+  opener.hidden = true;
   audio.prepare();
   hardStop = setTimeout(() => reveal({ cinematic: true }), 10500);
   load('entry');
@@ -180,13 +183,15 @@ welcome.addEventListener('animationend', event => {
 });
 skip.addEventListener('click', event => {
   event.preventDefault();
+  audio.unlock();
   reveal({ focus: true });
 });
 document.querySelector('#replay-invitation').addEventListener('click', event => {
   event.preventDefault();
-  if (motion.matches) return;
+  if (motion.matches) { audio.unlock(); audio.startCard(); window.scrollTo({ top: 0, behavior: 'instant' }); target.focus({ preventScroll: true }); return; }
   history.replaceState(null, '', location.pathname + location.search);
   window.scrollTo({ top: 0, behavior: 'instant' });
+  audio.unlock();
   play();
   skip.focus({ preventScroll: true });
 });
@@ -208,5 +213,12 @@ if (opened) {
   audio.startCard();
   if (location.hash) requestAnimationFrame(() => document.getElementById(location.hash.slice(1))?.scrollIntoView());
 } else {
-  play();
+  main.inert = footer.inert = true;
+  opener.hidden = false;
+  opener.addEventListener('click', () => {
+    audio.unlock();
+    play();
+    skip.focus({ preventScroll: true });
+  }, { once: true });
 }
+document.addEventListener('invitation-sound', event => audio.cue(event.detail));
