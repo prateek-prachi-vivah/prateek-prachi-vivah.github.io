@@ -30,7 +30,7 @@
 <link rel="stylesheet" href="/shubh-vivah/theme.css?v=53">
 <link rel="stylesheet" href="/darshan/theme.css?v=16">
 <script type="module" src="/shubh-vivah/invite.js?v=16"></script>
-<script type="module" src="/darshan/opening.js?v=16"></script>
+<script type="module" src="/darshan/opening.js?v=17"></script>
 <link rel="preload" as="image" href="/vaikuntha/ganesha.webp" fetchpriority="high">
 <link rel="icon" href="/assets/wedding-arch.svg" type="image/svg+xml">
 <script>if (new URLSearchParams(location.search).get('lang') === 'en') location.replace('/prateek-prachi-vivah/english/' + location.search + location.hash)</script>
@@ -42,8 +42,8 @@
 }</script>
 <nav class="invite-tools" aria-label="निमंत्रण की भाषा">
   <a href="/prateek-prachi-vivah/english/" lang="en" hreflang="en">English</a>
-</nav>
-<audio id="wedding-music" src="/darshan/vaikuntha-flute-balanced.mp3" preload="metadata" loop></audio>
+<button type="button" id="sound-toggle" aria-pressed="false">गणेश भजन चालू करें</button></nav>
+<audio id="wedding-music" src="/darshan/vaikuntha-flute-balanced.mp3" data-opening-src="/darshan/vaikuntha-flute-balanced.mp3" data-card-src="/shubh-vivah/ganesh-bhajan-soft.mp3" preload="none" loop></audio>
 <header id="top" class="intro" aria-label="श्री गणेशाय नमः">
   <div class="film" aria-hidden="true">
     <div class="film-periphery"></div>
@@ -161,7 +161,7 @@
   <p><span class="groom-name">प्रतीक</span> <i>और</i> <span class="bride-name">प्राची</span></p>
   <a class="jump" id="replay-invitation" href="#top">दर्शन फिर से देखें</a>
   <a class="jump" href="https://wa.me/?text=https://prateek-prachi-vivah.github.io/prateek-prachi-vivah/" target="_blank" rel="noopener noreferrer">WhatsApp पर निमंत्रण साझा करें</a>
-  <p class="music-credit">वैकुंठ बाँसुरी · इस निमंत्रण के लिए मौलिक संगीत और ध्वनि प्रभाव।</p>
+  <p class="music-credit">वैकुंठ बाँसुरी और ध्वनि प्रभाव · इस निमंत्रण के लिए मौलिक रचना। मूल गणेश भजन · <a href="https://pixabay.com/music/religious-theme-free-soul-jai-ganesha-bhajan-399994/" target="_blank" rel="noopener noreferrer">Free Soul Jai Ganesha Bhajan · kalsstockmedia</a> · <a href="https://pixabay.com/service/license-summary/" target="_blank" rel="noopener noreferrer">Pixabay Content License</a></p>
 </footer>
 </body>
 </html>

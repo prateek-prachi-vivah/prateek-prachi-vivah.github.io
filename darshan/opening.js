@@ -1,5 +1,5 @@
 import './motion.js?v=16';
-import { weddingAudio } from './audio.js?v=16';
+import { weddingAudio } from './audio.js?v=17';
 
 const root = document.documentElement;
 const intro = document.querySelector('#top');
@@ -21,6 +21,7 @@ let opened = !root.classList.contains('intro-open');
 
 const audio = weddingAudio({
   source: document.querySelector('#wedding-music'),
+  control: document.querySelector('#sound-toggle'),
 
   hindi: root.lang === 'hi',
   isCardOpen: () => opened
