@@ -922,3 +922,11 @@ footer { position: relative; isolation: isolate; }
   .film-shot[data-gate]:not([data-gate="1"]) .portal { width: min(88vw, 152vh); }
   .film-shot[data-gate="1"] .portal { width: min(62vw, 52vh); }
 }
+
+.room-scroll .event-body .dress,
+.room-scroll .event-body .dress :is(.eyebrow,.attire,.swatches li) { color: #382722; }
+.room-scroll .event-calendar a { padding: .5rem .8rem; }
+.celebration-room nav { display:grid; grid-template-columns: 44px minmax(44px, auto) minmax(0,1fr) 44px; }
+.celebration-room nav button { min-width: 0; font-size: clamp(.76rem,3.3vw,1rem); line-height:1.2; }
+.celebration-room [data-overview] { white-space:normal; overflow-wrap:anywhere; }
+.celebration-room header [data-music] { margin-inline-start:auto; }

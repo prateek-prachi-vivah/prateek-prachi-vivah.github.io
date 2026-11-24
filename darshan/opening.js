@@ -161,14 +161,19 @@ async function play() {
   if (token !== run) return;
   for (let number = 1; number <= 7; number++) {
     const name = number === 1 ? 'entry' : 'door-' + number;
-    const [preferred, hall, fallback] = await Promise.all([getArt(name), getArt('hall'), getArt('entry')]);
+    const [preferred, hall] = await Promise.all([getArt(name), getArt('hall')]);
     if (token !== run) return;
-    const image = preferred || fallback;
+    const image = preferred;
     const behind = hall || image;
     if (image && behind) {
       setFrame(name, image.cloneNode(), { inside: behind.cloneNode(), gate: number });
     } else {
       caption.textContent = sceneList.dataset.gateLabel + ' ' + number + ' / 7';
+      load(name).then(late => {
+        if (late && token === run && caption.textContent === sceneList.dataset.gateLabel + ' ' + number + ' / 7') {
+          setFrame(name, late.cloneNode(), {inside:(hall || late).cloneNode(), gate:number});
+        }
+      });
     }
     await wait(number === 7 ? 935 : 680);
     if (token !== run) return;

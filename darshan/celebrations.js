@@ -4,9 +4,18 @@ const tr = (en, hindi) => hi ? hindi : en;
 const dialog = document.createElement('dialog');
 dialog.className = 'celebration-room';
 dialog.setAttribute('aria-labelledby', 'room-title');
-dialog.innerHTML = '<header><button type="button" data-close></button><output aria-live="polite"></output></header><section class="room-scroll"></section><nav><button data-prev>←</button><button data-tour></button><button data-overview></button><button data-next>→</button></nav><div class="doorway" aria-hidden="true"><i></i><i></i></div>';
+dialog.innerHTML = '<header><button type="button" data-close></button><button type="button" data-music></button><output aria-live="polite"></output></header><section class="room-scroll"></section><nav><button data-prev>←</button><button data-tour></button><button data-overview></button><button data-next>→</button></nav><div class="doorway" aria-hidden="true"><i></i><i></i></div>';
 document.body.append(dialog);
 const get = s => dialog.querySelector(s);
+const mainMusic = document.querySelector('#sound-toggle');
+const roomMusic = get('[data-music]');
+const syncMusic = () => {
+  roomMusic.textContent = mainMusic.textContent;
+  roomMusic.setAttribute('aria-pressed', mainMusic.getAttribute('aria-pressed'));
+};
+new MutationObserver(syncMusic).observe(mainMusic, {childList:true, attributes:true, attributeFilter:['aria-pressed']});
+syncMusic();
+roomMusic.addEventListener('click', () => mainMusic.click());
 const cards = () => [...document.querySelectorAll('#events .event-card')];
 let current = 0;
 let returnTo;
@@ -43,7 +52,7 @@ function render(index) {
   scheduleTour();
   const doors = get('.doorway');
   doors.replaceWith(doors.cloneNode(true));
-  document.dispatchEvent(new CustomEvent('invitation-sound', {detail:'room'}));
+
 }
 function openRoom(index, button) {
   if (!dialog.open) {
