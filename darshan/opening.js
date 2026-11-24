@@ -26,7 +26,7 @@ const audio = weddingAudio({
   hindi: root.lang === 'hi',
   isCardOpen: () => opened
 });
-clearTimeout(window.invitationFallback);
+
 document.addEventListener('click', event => {
   if (event.isTrusted && document.querySelector('#wedding-music').paused && !event.target.closest('#sound-toggle')) {
     audio.unlock();
@@ -47,7 +47,8 @@ function load(name) {
     img.alt = '';
     img.decoding = 'async';
     img.src = artUrl(name);
-    cache.set(name, img.decode().then(() => img, () => null));
+    const ready = img.decode ? img.decode() : new Promise((resolve, reject) => { img.onload = resolve; img.onerror = reject; });
+    cache.set(name, ready.then(() => img, () => null));
   }
   return cache.get(name);
 }
@@ -62,6 +63,7 @@ function reveal({ cinematic = false, focus = false } = {}) {
   if (opened) return;
   run++;
   clearTimeout(hardStop);
+  clearTimeout(window.invitationFallback);
   opened = true;
   root.classList.remove('intro-open');
   const animate = cinematic && !motion.matches;
@@ -148,8 +150,8 @@ async function play() {
   caption.textContent = scenes.ganesh.textContent;
   intro.setAttribute('aria-label', scenes.ganesh.dataset.description);
   opener.hidden = true;
+  hardStop = setTimeout(() => reveal(), 10500);
   audio.prepare();
-  hardStop = setTimeout(() => reveal({ cinematic: true }), 10500);
   load('entry');
   load('hall');
   load('vishnu');
@@ -211,7 +213,7 @@ window.addEventListener('hashchange', () => {
     section.scrollIntoView();
   }
 });
-motion.addEventListener('change', event => {
+motion.addEventListener?.('change', event => {
   if (event.matches) reveal();
 });
 
@@ -225,7 +227,7 @@ if (opened) {
   main.inert = footer.inert = true;
   opener.hidden = false;
   if (motion.matches) reveal();
-  else play();
+  else play().catch(() => reveal());
   opener.addEventListener('click', () => {
     if (!motion.matches && typeof window.DeviceOrientationEvent?.requestPermission === 'function') window.DeviceOrientationEvent.requestPermission().catch(()=>{});
     audio.unlock();

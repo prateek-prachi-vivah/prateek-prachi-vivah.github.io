@@ -917,3 +917,8 @@ footer { position: relative; isolation: isolate; }
   .room-scroll .event-body > * { grid-column: 1; }
   .room-scroll .event-art { grid-column: 2; grid-row: 1 / span 12; max-height: 74dvh; }
 }
+/* Keep the complete palace and door swing inside short desktop windows. */
+@media (min-width: 900px) {
+  .film-shot[data-gate]:not([data-gate="1"]) .portal { width: min(88vw, 152vh); }
+  .film-shot[data-gate="1"] .portal { width: min(62vw, 52vh); }
+}

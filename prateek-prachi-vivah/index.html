@@ -28,9 +28,9 @@
 <link rel="stylesheet" href="/styles.css">
 <link rel="stylesheet" href="/rajputana/theme.css">
 <link rel="stylesheet" href="/shubh-vivah/theme.css?v=53">
-<link rel="stylesheet" href="/darshan/theme.css?v=19">
+<link rel="stylesheet" href="/darshan/theme.css?v=20">
 <script type="module" src="/shubh-vivah/invite.js?v=19"></script>
-<script type="module" src="/darshan/opening.js?v=18"></script>
+<script type="module" src="/darshan/opening.js?v=20"></script>
 <link rel="preload" as="image" href="/vaikuntha/ganesha.webp" fetchpriority="high">
 <link rel="icon" href="/assets/wedding-arch.svg" type="image/svg+xml">
 <script>if (new URLSearchParams(location.search).get('lang') === 'en') location.replace('/prateek-prachi-vivah/english/' + location.search + location.hash)</script>
@@ -38,7 +38,10 @@
 <body>
 <script>if (!location.hash || location.hash === "#top") {
   document.documentElement.classList.add("intro-open");
-  window.invitationFallback = setTimeout(() => document.documentElement.classList.remove("intro-open"), 13000);
+  window.invitationFallback = setTimeout(() => {
+    document.documentElement.classList.remove("intro-open");
+    document.querySelectorAll("main, footer").forEach(section => section.removeAttribute("inert"));
+  }, 13000);
 }</script>
 <nav class="invite-tools" aria-label="निमंत्रण की भाषा">
   <a href="/prateek-prachi-vivah/english/" lang="en" hreflang="en">English</a>
