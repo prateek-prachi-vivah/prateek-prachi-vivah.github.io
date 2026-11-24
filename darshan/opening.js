@@ -27,6 +27,13 @@ const audio = weddingAudio({
   isCardOpen: () => opened
 });
 clearTimeout(window.invitationFallback);
+document.addEventListener('click', event => {
+  if (event.isTrusted && !event.target.closest('button, a')) {
+    audio.unlock();
+    if (opened) audio.startCard();
+    else audio.prepare();
+  }
+});
 
 function artUrl(name) {
   const smallScene = name === 'entry' || name === 'hall' || name === 'vishnu';
