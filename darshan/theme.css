@@ -894,3 +894,26 @@ footer { position: relative; isolation: isolate; }
   .room-scroll { align-items: start; }
   .room-scroll .event-art { max-height: 80dvh; }
 }
+.welcome.scene.welcome-painting .welcome-art img {
+  object-fit: contain; object-position: center; transform: none;
+}
+@media (max-width: 899px) {
+  .welcome.scene.welcome-painting .welcome-art img { aspect-ratio: auto; max-height: 48dvh; }
+}
+.celebration-room nav { flex-wrap: wrap; }
+.celebration-room nav button { padding-inline: .55em; }
+.room-scroll .event-art {
+  width: 100%; height: auto; aspect-ratio: 3 / 2;
+  max-height: 52dvh; object-fit: contain; object-position: center;
+}
+.room-scroll .event-body { display: contents; }
+.room-scroll { display: grid; grid-template-columns: minmax(0,1fr); align-content:start; padding: .75rem; gap:.55rem; }
+.room-scroll .event-body > * { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+.room-scroll .event-art { grid-row: 5; }
+.room-scroll .event-body > * { color: var(--light); }
+.room-scroll .event-calendar a { background: var(--paper); color: var(--ink); }
+@media (min-width: 850px) {
+  .room-scroll { grid-template-columns: minmax(0,1fr) minmax(0,1fr); }
+  .room-scroll .event-body > * { grid-column: 1; }
+  .room-scroll .event-art { grid-column: 2; grid-row: 1 / span 12; max-height: 74dvh; }
+}

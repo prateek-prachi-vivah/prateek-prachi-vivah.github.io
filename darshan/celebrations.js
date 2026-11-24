@@ -4,13 +4,24 @@ const tr = (en, hindi) => hi ? hindi : en;
 const dialog = document.createElement('dialog');
 dialog.className = 'celebration-room';
 dialog.setAttribute('aria-labelledby', 'room-title');
-dialog.innerHTML = '<header><button type="button" data-close></button><output aria-live="polite"></output></header><section class="room-scroll"></section><nav><button data-prev>←</button><button data-overview></button><button data-next>→</button></nav><div class="doorway" aria-hidden="true"><i></i><i></i></div>';
+dialog.innerHTML = '<header><button type="button" data-close></button><output aria-live="polite"></output></header><section class="room-scroll"></section><nav><button data-prev>←</button><button data-tour></button><button data-overview></button><button data-next>→</button></nav><div class="doorway" aria-hidden="true"><i></i><i></i></div>';
 document.body.append(dialog);
 const get = s => dialog.querySelector(s);
 const cards = () => [...document.querySelectorAll('#events .event-card')];
 let current = 0;
 let returnTo;
 let gesture;
+let timer;
+let touring = true;
+const tour = get('[data-tour]');
+function scheduleTour() {
+  clearTimeout(timer);
+  tour.textContent = touring ? tr('Hold','रोकें') : tr('Continue','जारी रखें');
+  if (!touring || !dialog.open || document.hidden) return;
+  timer = setTimeout(() => current === cards().length - 1 ? closeRoom() : render(current + 1), 18000);
+}
+tour.onclick = () => { touring = !touring; scheduleTour(); };
+document.addEventListener('visibilitychange', scheduleTour);
 get('[data-close]').textContent = tr('Close','बंद करें');
 get('[data-overview]').textContent = tr('View all celebrations','सभी कार्यक्रम देखें');
 get('[data-prev]').ariaLabel = tr('Previous celebration','पिछला कार्यक्रम');
@@ -29,6 +40,7 @@ function render(index) {
   content.scrollTop = 0;
   dialog.style.setProperty('--room-accent', card.style.getPropertyValue('--accent'));
   get('output').textContent = (current + 1) + ' / ' + entries.length;
+  scheduleTour();
   const doors = get('.doorway');
   doors.replaceWith(doors.cloneNode(true));
   document.dispatchEvent(new CustomEvent('invitation-sound', {detail:'room'}));
@@ -36,6 +48,7 @@ function render(index) {
 function openRoom(index, button) {
   if (!dialog.open) {
     returnTo = button;
+    touring = true;
     history.pushState({...history.state, invitationRoom:true}, '');
     dialog.showModal();
   }
@@ -46,10 +59,11 @@ function closeRoom() {
   else dialog.close();
 }
 addEventListener('popstate', () => { if (dialog.open) dialog.close(); });
-dialog.addEventListener('close', () => returnTo?.focus({preventScroll:true}));
+dialog.addEventListener('close', () => { clearTimeout(timer); returnTo?.focus({preventScroll:true}); });
+get('.room-scroll').addEventListener('scroll', () => { if (touring && get('.room-scroll').scrollTop > 0) { touring = false; scheduleTour(); } }, {passive:true});
 dialog.addEventListener('cancel', e => { e.preventDefault(); closeRoom(); });
 get('[data-prev]').onclick = () => render(current - 1);
-get('[data-next]').onclick = () => render(current + 1);
+get('[data-next]').onclick = () => current === cards().length - 1 ? closeRoom() : render(current + 1);
 get('[data-close]').onclick = get('[data-overview]').onclick = closeRoom;
 dialog.addEventListener('keydown', e => {
   if (['ArrowLeft','ArrowRight'].includes(e.key)) { e.preventDefault(); render(current + (e.key === 'ArrowLeft' ? -1 : 1)); }
