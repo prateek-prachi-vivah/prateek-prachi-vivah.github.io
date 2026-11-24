@@ -1,5 +1,5 @@
-import './motion.js?v=15';
-import { weddingAudio } from './audio.js?v=15';
+import './motion.js?v=16';
+import { weddingAudio } from './audio.js?v=16';
 
 const root = document.documentElement;
 const intro = document.querySelector('#top');
@@ -21,7 +21,7 @@ let opened = !root.classList.contains('intro-open');
 
 const audio = weddingAudio({
   source: document.querySelector('#wedding-music'),
-  control: document.querySelector('#sound-toggle'),
+
   hindi: root.lang === 'hi',
   isCardOpen: () => opened
 });
@@ -211,12 +211,15 @@ if (opened) {
   intro.hidden = true;
   document.body.classList.add('card-visible');
   audio.startCard();
+  document.addEventListener('click',()=>audio.unlock(),{once:true});
   if (location.hash) requestAnimationFrame(() => document.getElementById(location.hash.slice(1))?.scrollIntoView());
 } else {
   main.inert = footer.inert = true;
   opener.hidden = false;
   opener.addEventListener('click', () => {
+    if (!motion.matches && typeof window.DeviceOrientationEvent?.requestPermission === 'function') window.DeviceOrientationEvent.requestPermission().catch(()=>{});
     audio.unlock();
+    if (motion.matches) { reveal({focus:true}); return; }
     play();
     skip.focus({ preventScroll: true });
   }, { once: true });

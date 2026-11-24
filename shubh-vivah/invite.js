@@ -389,3 +389,5 @@ if ('IntersectionObserver' in window && !motion.matches) {
     reveal.observe(section);
   }
 }
+
+import('/darshan/celebrations.js?v=16');
