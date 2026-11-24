@@ -28,7 +28,7 @@ const audio = weddingAudio({
 });
 clearTimeout(window.invitationFallback);
 document.addEventListener('click', event => {
-  if (event.isTrusted && !event.target.closest('button, a')) {
+  if (event.isTrusted && document.querySelector('#wedding-music').paused && !event.target.closest('#sound-toggle')) {
     audio.unlock();
     if (opened) audio.startCard();
     else audio.prepare();
