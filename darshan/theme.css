@@ -886,3 +886,11 @@ footer { position: relative; isolation: isolate; }
 }
 @keyframes temple-light {from{opacity:.1;transform:scale(.98);}65%{opacity:.8;}to{opacity:.18;transform:scale(1.03);}}
 @keyframes room-camera {from{transform:perspective(1400px) translateZ(-95px);}to{transform:perspective(1400px) translateZ(0);}}
+
+/* Details lead on phones. Both columns start at the top on wider screens. */
+.room-scroll .event-body { margin-block: 0; }
+.room-scroll .event-art { height: auto; max-height: 62dvh; }
+@media (min-width: 850px) {
+  .room-scroll { align-items: start; }
+  .room-scroll .event-art { max-height: 80dvh; }
+}

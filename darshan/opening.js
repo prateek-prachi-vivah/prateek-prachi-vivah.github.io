@@ -217,6 +217,8 @@ if (opened) {
 } else {
   main.inert = footer.inert = true;
   opener.hidden = false;
+  if (motion.matches) reveal();
+  else play();
   opener.addEventListener('click', () => {
     if (!motion.matches && typeof window.DeviceOrientationEvent?.requestPermission === 'function') window.DeviceOrientationEvent.requestPermission().catch(()=>{});
     audio.unlock();

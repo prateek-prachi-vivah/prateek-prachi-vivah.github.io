@@ -24,7 +24,7 @@ function render(index) {
   const body = card.querySelector('.event-body').cloneNode(true);
   body.querySelector('h3').id = 'room-title';
   const content = get('.room-scroll');
-  content.replaceChildren(picture, body);
+  content.replaceChildren(body, picture);
   content.classList.add('room-enter');
   content.scrollTop = 0;
   dialog.style.setProperty('--room-accent', card.style.getPropertyValue('--accent'));

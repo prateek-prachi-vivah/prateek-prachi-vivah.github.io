@@ -390,4 +390,4 @@ if ('IntersectionObserver' in window && !motion.matches) {
   }
 }
 
-import('/darshan/celebrations.js?v=16');
+import('/darshan/celebrations.js?v=18');
