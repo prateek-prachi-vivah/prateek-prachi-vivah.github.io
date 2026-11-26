@@ -1,5 +1,5 @@
 import './motion.js?v=16';
-import { weddingAudio } from './audio.js?v=17';
+import { weddingAudio } from './audio.js?v=22';
 
 const root = document.documentElement;
 const intro = document.querySelector('#top');
@@ -27,13 +27,11 @@ const audio = weddingAudio({
   isCardOpen: () => opened
 });
 
-document.addEventListener('click', event => {
-  if (event.isTrusted && document.querySelector('#wedding-music').paused && !event.target.closest('#sound-toggle')) {
-    audio.unlock();
-    if (opened) audio.startCard();
-    else audio.prepare();
-  }
-});
+for (const type of ['pointerdown', 'touchstart', 'keydown', 'scroll', 'click']) {
+  document.addEventListener(type, event => {
+    if (event.isTrusted && !event.target.closest?.('#sound-toggle, [data-music]')) audio.retry();
+  }, { passive: true, capture: true });
+}
 
 function artUrl(name) {
   const smallScene = name === 'entry' || name === 'hall' || name === 'vishnu';
@@ -130,9 +128,8 @@ function setFrame(name, image, { inside, gate } = {}) {
     caption.textContent = scenes[name].textContent;
     intro.setAttribute('aria-label', scenes[name].dataset.description);
   }
-  const previous = stage.lastElementChild;
-  stage.append(layer);
-  if (previous) setTimeout(() => previous.remove(), 320);
+  stage.replaceChildren(layer);
+  intro.classList.add('has-shot');
 }
 
 async function play() {
@@ -147,6 +144,7 @@ async function play() {
   intro.classList.add('is-playing');
   welcome.classList.remove('book-opening');
   stage.replaceChildren();
+  intro.classList.remove('has-shot');
   caption.textContent = scenes.ganesh.textContent;
   intro.setAttribute('aria-label', scenes.ganesh.dataset.description);
   opener.hidden = true;

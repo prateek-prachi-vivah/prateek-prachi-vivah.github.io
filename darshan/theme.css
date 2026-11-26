@@ -930,3 +930,12 @@ footer { position: relative; isolation: isolate; }
 .celebration-room nav button { min-width: 0; font-size: clamp(.76rem,3.3vw,1rem); line-height:1.2; }
 .celebration-room [data-overview] { white-space:normal; overflow-wrap:anywhere; }
 .celebration-room header [data-music] { margin-inline-start:auto; }
+
+/* The poster yields to an opaque stage before each individual shot fades in. */
+.has-shot .film-poster, .has-shot .film-periphery { visibility: hidden; }
+.has-shot .film-scene { background: #201722; }
+.film-shot[data-gate][data-shot] .portal { width: min(96vw, 144svh); aspect-ratio: 764 / 337; overflow: hidden; }
+.film-shot[data-gate="1"] .portal-architecture { object-fit: cover; object-position: center; }
+.film-shot[data-gate="1"] .portal-aperture { top: 0; height: 100%; }
+:lang(hi):is(.eyebrow, p, span, a, button, h1, h2, h3, div), [lang="sa"] { letter-spacing: normal; font-family: 'Noto Invitation', 'Nirmala UI', Georgia, serif; }
+html { scroll-padding-top: calc(4.5rem + env(safe-area-inset-top)); }

@@ -359,9 +359,9 @@ for (const venue of wedding.venues) {
   caption.append(create('span', '', isKurwai
     ? (isHindi ? 'मुख्य द्वार · कुरवाई' : 'Main entrance · Kurwai')
     : (isHindi ? 'इमारत और लॉन · भोपाल' : 'Building and lawn · Bhopal')));
-  if (!isKurwai) {
-    const credit = create('a', '', 'Weddingz.in');
-    credit.href = 'https://weddingz.in/bhopal/royal-celebrations-club-hotel-misrod/';
+  {
+    const credit = create('a', '', (isHindi ? 'चित्र: ' : 'Photo: ') + (isKurwai ? 'Mandap.com' : 'Weddingz.in'));
+    credit.href = isKurwai ? 'https://www.mandap.com/vidisha/the-patel-landmark-in-vidisha' : 'https://weddingz.in/bhopal/royal-celebrations-club-hotel-misrod/';
     credit.target = '_blank';
     credit.rel = 'noopener noreferrer';
     caption.append(credit);
@@ -390,4 +390,4 @@ if ('IntersectionObserver' in window && !motion.matches) {
   }
 }
 
-import('/darshan/celebrations.js?v=21');
+import('/darshan/celebrations.js?v=22');

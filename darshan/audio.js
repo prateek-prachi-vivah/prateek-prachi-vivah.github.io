@@ -78,7 +78,7 @@ export function weddingAudio({ source, control, hindi, isCardOpen }) {
   }
 
   async function play({ gesture = false, fresh = false } = {}) {
-    if (!unlocked || preference === 'off' || document.hidden) return;
+    if (preference === 'off' || document.hidden) return;
     const token = ++generation;
     const index = phase;
     const changing = source.src !== tracks[index] && !source.paused;
@@ -114,7 +114,7 @@ export function weddingAudio({ source, control, hindi, isCardOpen }) {
       if (changing && !music && source.volume < .95) nativeRamp(source.volume, 1, token);
       else source.volume = 1;
       if (music) setGain(.8);
-      if (!gesture) enableMixer();
+      if (unlocked && !gesture) enableMixer();
     } catch (error) {
       if (token === generation) {
         failed = error?.name !== 'NotAllowedError';
@@ -180,8 +180,15 @@ export function weddingAudio({ source, control, hindi, isCardOpen }) {
     if (document.hidden) stop();
     else play();
   });
+  for (const event of ['playing', 'pause', 'ended', 'error']) source.addEventListener(event, show);
   show();
   return {
+    retry() {
+      if (preference === 'off' || document.hidden) return;
+      unlocked = true;
+      if (source.paused && !loading) play({gesture: true});
+      else if (!source.paused && !music) enableMixer();
+    },
     unlock() {
       unlocked = true;
       if (preference !== 'off') enableMixer();

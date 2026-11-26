@@ -88,7 +88,7 @@ for (const [i, card] of cards().entries()) {
   const button = document.createElement('button');
   button.type = 'button';
   button.className = 'room-open';
-  button.textContent = tr('Open celebration','कार्यक्रम खोलें') + ' · ' + (i+1) + '/7';
+  button.textContent = tr('Details','विवरण') + ' · ' + (i+1) + '/7';
   button.onclick = () => openRoom(i,button);
   card.querySelector('.event-art-frame').append(button);
 }
