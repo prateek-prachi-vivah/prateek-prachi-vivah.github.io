@@ -939,3 +939,28 @@ footer { position: relative; isolation: isolate; }
 .film-shot[data-gate="1"] .portal-aperture { top: 0; height: 100%; }
 :lang(hi):is(.eyebrow, p, span, a, button, h1, h2, h3, div), [lang="sa"] { letter-spacing: normal; font-family: 'Noto Invitation', 'Nirmala UI', Georgia, serif; }
 html { scroll-padding-top: calc(4.5rem + env(safe-area-inset-top)); }
+
+/* A facing-page layout keeps the complete portrait beside the invitation. */
+@media (min-width: 900px) {
+  .welcome.scene.welcome-painting {
+    grid-template-columns: minmax(0, 36rem) minmax(0, 32rem);
+    justify-content: center;
+    justify-items: stretch;
+    gap: clamp(1.5rem, 4vw, 4rem);
+    padding: clamp(1.5rem, 4vh, 3rem) clamp(2rem, 5vw, 6rem);
+    min-height: calc(100svh - 3.55rem);
+    background: radial-gradient(ellipse at 69% 45%, #975c36, #63382d 58%, #35232a);
+  }
+  .welcome.scene.welcome-painting .welcome-art {
+    position: relative; inset: auto; grid-area: 1 / 2; z-index: 0;
+    height: min(78svh, 47rem); margin: 0; align-self: center;
+  }
+  .welcome-painting .book-reveal { width: 100%; grid-area: 1 / 1; }
+  .welcome.scene.welcome-painting .welcome-art img { display: block; width: 100%; height: 100%; object-fit: contain; }
+  .film-shot[data-gate][data-shot] .portal { width: min(98vw, 190svh); }
+  .room-scroll { align-content: safe center; padding-inline: clamp(1.5rem, 5vw, 6rem); column-gap: 3vw; }
+  .room-scroll .event-art { align-self: center; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .intro .film *, .intro .film *::before, .intro .film *::after { animation: none !important; }
+}

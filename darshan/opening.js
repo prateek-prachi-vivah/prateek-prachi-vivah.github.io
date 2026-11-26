@@ -1,6 +1,14 @@
 import './motion.js?v=16';
 import { weddingAudio } from './audio.js?v=22';
 
+// Previously shared invitation links can carry an older edition in their query.
+const address = new URL(location.href);
+if (address.searchParams.has('edition') || address.searchParams.has('v')) {
+  address.searchParams.set('edition', '23');
+  address.searchParams.set('v', 'darshan23');
+  history.replaceState(history.state, '', address);
+}
+
 const root = document.documentElement;
 const intro = document.querySelector('#top');
 const stage = document.querySelector('#film-scene');
@@ -133,10 +141,13 @@ function setFrame(name, image, { inside, gate } = {}) {
 }
 
 async function play() {
+  clearTimeout(hardStop);
+  clearTimeout(window.invitationFallback);
   const token = ++run;
   opened = false;
   main.inert = footer.inert = true;
   intro.hidden = false;
+  window.scrollTo({top: 0, behavior: 'instant'});
   intro.inert = false;
   intro.classList.remove('is-dissolving');
   document.body.classList.remove('card-visible');
@@ -201,7 +212,7 @@ skip.addEventListener('click', event => {
 });
 document.querySelector('#replay-invitation').addEventListener('click', event => {
   event.preventDefault();
-  if (motion.matches) { audio.unlock(); audio.startCard(); window.scrollTo({ top: 0, behavior: 'instant' }); target.focus({ preventScroll: true }); return; }
+
   history.replaceState(null, '', location.pathname + location.search);
   window.scrollTo({ top: 0, behavior: 'instant' });
   audio.unlock();
@@ -229,8 +240,7 @@ if (opened) {
 } else {
   main.inert = footer.inert = true;
   opener.hidden = false;
-  if (motion.matches) reveal();
-  else play().catch(() => reveal());
+  play().catch(() => reveal());
   opener.addEventListener('click', () => {
     if (!motion.matches && typeof window.DeviceOrientationEvent?.requestPermission === 'function') window.DeviceOrientationEvent.requestPermission().catch(()=>{});
     audio.unlock();
@@ -240,3 +250,10 @@ if (opened) {
   }, { once: true });
 }
 document.addEventListener('invitation-sound', event => audio.cue(event.detail));
+
+// Browser Back can restore a half-finished timer and a stale scroll position.
+window.addEventListener('pageshow', event => {
+  if (event.persisted && (!location.hash || location.hash === '#top')) {
+    play().catch(() => reveal());
+  }
+});
