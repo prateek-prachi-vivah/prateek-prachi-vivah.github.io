@@ -964,3 +964,39 @@ html { scroll-padding-top: calc(4.5rem + env(safe-area-inset-top)); }
 @media (prefers-reduced-motion: reduce) {
   .intro .film *, .intro .film *::before, .intro .film *::after { animation: none !important; }
 }
+
+/* The wide-screen doorway is drawn at display resolution. */
+@media (min-width: 900px) {
+  .film-shot[data-gate]::before {
+    background: radial-gradient(ellipse at 50% 35%,#b4824e,#503034 55%,#171827);
+    filter: none;
+  }
+  .film-shot[data-gate][data-shot] .portal {
+    width: min(69vh,65vw); height: min(72vh,55rem); aspect-ratio: auto;
+    max-height: none; overflow: visible; border-radius: 50% 50% 1% 1% / 31% 31% 1% 1%;
+    background: linear-gradient(100deg,#8c653e,#f1d598 20%,#7e5438 43%,#e9c58b 77%,#815335);
+    box-shadow: 0 0 0 .4rem #512e29,0 0 0 .55rem #bc965d,0 0 0 1.25rem #634432,0 0 0 1.4rem #bf9661,0 1rem 3rem #181322;
+  }
+  .film-shot[data-gate] .portal-architecture { visibility: hidden; }
+  .film-shot[data-gate][data-shot] .portal-aperture {
+    inset: 2.4% 3% 1%; width: auto; height: auto;
+    border-radius: 50% 50% 0 0 / 31% 31% 0 0;
+  }
+  .film-shot[data-gate] .portal-leaf {
+    background: url('./palace-panel.svg') center / 100% 100%;
+    --swing-time: .93s;
+  }
+  .film-shot[data-gate] .portal-doors { perspective: 1200px; }
+  .film-shot[data-gate] .portal { --gate-slot: 1.18s; }
+  .film-shot[data-gate="2"],.film-shot[data-gate="5"] { --gate-hue: 18deg; }
+  .film-shot[data-gate="3"],.film-shot[data-gate="6"] { --gate-hue: -15deg; }
+  .film-shot[data-gate] .portal-leaf { filter: hue-rotate(var(--gate-hue,0deg)); }
+}
+@media (min-width:900px) and (prefers-reduced-motion:no-preference) {
+  .light-motion .film .portal-leaf { animation-duration: .93s !important; }
+}
+@media (min-width:900px) {
+  .film-shot[data-gate]::before {
+    background: linear-gradient(90deg,#251a28a8,#48302540 32%,#48302540 68%,#251a28a8), url('./hall.webp') center 48% / cover;
+  }
+}

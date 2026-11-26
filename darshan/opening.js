@@ -4,8 +4,8 @@ import { weddingAudio } from './audio.js?v=22';
 // Previously shared invitation links can carry an older edition in their query.
 const address = new URL(location.href);
 if (address.searchParams.has('edition') || address.searchParams.has('v')) {
-  address.searchParams.set('edition', '23');
-  address.searchParams.set('v', 'darshan23');
+  address.searchParams.set('edition', '24');
+  address.searchParams.set('v', 'darshan24');
   history.replaceState(history.state, '', address);
 }
 
@@ -159,7 +159,7 @@ async function play() {
   caption.textContent = scenes.ganesh.textContent;
   intro.setAttribute('aria-label', scenes.ganesh.dataset.description);
   opener.hidden = true;
-  hardStop = setTimeout(() => reveal(), 10500);
+  hardStop = setTimeout(() => reveal(), 16500);
   audio.prepare();
   load('entry');
   load('hall');
@@ -184,7 +184,7 @@ async function play() {
         }
       });
     }
-    await wait(number === 7 ? 935 : 680);
+    await wait(matchMedia('(min-width: 900px)').matches ? 1180 : number === 7 ? 935 : 680);
     if (token !== run) return;
   }
 

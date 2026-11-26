@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 500" preserveAspectRatio="none">
+<defs>
+ <linearGradient id="wood"><stop stop-color="#351d22"/><stop offset=".3" stop-color="#753c2b"/><stop offset=".65" stop-color="#582b24"/><stop offset="1" stop-color="#301a20"/></linearGradient>
+ <linearGradient id="brass"><stop stop-color="#75502c"/><stop offset=".28" stop-color="#eccb87"/><stop offset=".54" stop-color="#a57840"/><stop offset=".83" stop-color="#e1bc76"/><stop offset="1" stop-color="#704d2d"/></linearGradient>
+ <pattern id="lattice" width="24" height="32" patternUnits="userSpaceOnUse"><path d="M12 0Q12 8 24 16Q12 24 12 32Q12 24 0 16Q12 8 12 0Z" fill="none" stroke="#ad814b" stroke-width="1"/><circle cx="12" cy="16" r="2" fill="#bb9059"/></pattern>
+ <path id="petal" d="M0 0Q-13-12 0-36Q13-12 0 0Z"/>
+ <g id="flower" fill="url(#brass)" stroke="#865e37"><use href="#petal"/><use href="#petal" transform="rotate(45)"/><use href="#petal" transform="rotate(90)"/><use href="#petal" transform="rotate(135)"/><use href="#petal" transform="rotate(180)"/><use href="#petal" transform="rotate(225)"/><use href="#petal" transform="rotate(270)"/><use href="#petal" transform="rotate(315)"/><circle r="8"/></g>
+</defs>
+<rect width="200" height="500" fill="url(#wood)"/><g stroke="url(#brass)" fill="none"><rect x="5" y="4" width="190" height="492" stroke-width="5"/><rect x="12" y="12" width="176" height="476" stroke-width="2"/><path d="M24 215V86Q24 65 45 65Q48 44 70 44Q88 42 100 23Q112 42 130 44Q152 44 155 65Q176 65 176 86V215ZM24 282H176V474H24Z" fill="url(#lattice)" stroke-width="4"/></g>
+<use href="#flower" transform="translate(100 131)"/><use href="#flower" transform="translate(100 376)"/>
+<rect x="13" y="231" width="174" height="34" rx="3" fill="url(#brass)"/><g fill="#583c29"><circle cx="28" cy="248" r="4"/><circle cx="172" cy="248" r="4"/></g><circle cx="100" cy="253" r="12" fill="none" stroke="#4d3026" stroke-width="5"/>
+</svg>
