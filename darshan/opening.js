@@ -4,8 +4,8 @@ import { weddingAudio } from './audio.js?v=22';
 // Previously shared invitation links can carry an older edition in their query.
 const address = new URL(location.href);
 if (address.searchParams.has('edition') || address.searchParams.has('v')) {
-  address.searchParams.set('edition', '24');
-  address.searchParams.set('v', 'darshan24');
+  address.searchParams.set('edition', '25');
+  address.searchParams.set('v', 'darshan25');
   history.replaceState(history.state, '', address);
 }
 
@@ -140,7 +140,17 @@ function setFrame(name, image, { inside, gate } = {}) {
   intro.classList.add('has-shot');
 }
 
+function enterDesktop() {
+  intro.hidden = true;
+  document.body.classList.add('card-visible');
+  if (!motion.matches && (!location.hash || location.hash === '#top')) {
+    welcome.classList.remove('book-opening');
+    requestAnimationFrame(() => requestAnimationFrame(() => welcome.classList.add('book-opening')));
+  }
+  audio.startCard();
+}
 async function play() {
+  if (root.dataset.entry === 'card') { enterDesktop(); return; }
   clearTimeout(hardStop);
   clearTimeout(window.invitationFallback);
   const token = ++run;
@@ -217,7 +227,7 @@ document.querySelector('#replay-invitation').addEventListener('click', event => 
   window.scrollTo({ top: 0, behavior: 'instant' });
   audio.unlock();
   play();
-  skip.focus({ preventScroll: true });
+  (root.dataset.entry === 'card' ? target : skip).focus({ preventScroll: true });
 });
 document.addEventListener('invitation-date-revealed', () => audio.cue('cord'));
 window.addEventListener('hashchange', () => {
@@ -232,9 +242,10 @@ motion.addEventListener?.('change', event => {
 });
 
 if (opened) {
+  if (root.dataset.entry === 'card') enterDesktop();
   intro.hidden = true;
   document.body.classList.add('card-visible');
-  audio.startCard();
+  if (root.dataset.entry !== 'card') audio.startCard();
   document.addEventListener('click',()=>audio.unlock(),{once:true});
   if (location.hash) requestAnimationFrame(() => document.getElementById(location.hash.slice(1))?.scrollIntoView());
 } else {
