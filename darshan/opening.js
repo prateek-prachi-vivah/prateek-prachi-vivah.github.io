@@ -1,11 +1,11 @@
-import './motion.js?v=16';
+import './motion.js?v=26';
 import { weddingAudio } from './audio.js?v=22';
 
 // Previously shared invitation links can carry an older edition in their query.
 const address = new URL(location.href);
 if (address.searchParams.has('edition') || address.searchParams.has('v')) {
-  address.searchParams.set('edition', '25');
-  address.searchParams.set('v', 'darshan25');
+  address.searchParams.set('edition', '26');
+  address.searchParams.set('v', 'darshan26');
   history.replaceState(history.state, '', address);
 }
 

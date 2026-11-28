@@ -831,7 +831,7 @@ footer { position: relative; isolation: isolate; }
 @keyframes paper-lift { from { transform: perspective(700px) rotateX(-16deg); } }
 @keyframes pin-drop { from { transform: translateY(-12px) scale(.9); opacity: .3; } }
 @media (prefers-reduced-motion: no-preference) {
-  html:not(.light-motion) .diya-dust { animation: diya-drift 3.6s ease-in-out infinite alternate; }
+  html:not(.light-motion) .dust-visible > .diya-dust { animation: diya-drift 3.6s ease-in-out infinite alternate; }
   html:not(.light-motion) .welcome-art img { transform: translateY(var(--drift,0px)) scale(1.035); }
   html:not(.light-motion) .welcome #welcome-names { transform: perspective(650px) rotateY(var(--tilt,0deg)); }
   html:not(.light-motion) .schedule:not(.schedule-list) .event-card { transform: perspective(900px) rotateY(var(--fan,0deg)) scale(.95); transition: transform .38s cubic-bezier(.2,.7,.25,1); }

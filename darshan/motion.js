@@ -13,27 +13,40 @@ for (const element of [document.querySelector('.film'), hero, footer]) {
   dust.setAttribute('aria-hidden', 'true');
   element.append(dust);
 }
+const desktopPointer = matchMedia('(min-width: 900px) and (hover: hover) and (pointer: fine)');
 let visible = false;
 let scheduled = false;
+let tilt = 0;
 function move() {
   scheduled = false;
-  if (quiet() || !visible) return;
+  if (quiet() || !visible || !desktopPointer.matches || document.hidden) return;
   const offset = Math.max(-1, Math.min(1, -hero.getBoundingClientRect().top / innerHeight));
-  hero.style.setProperty('--drift', (offset * 12).toFixed(1) + 'px');
+  hero.style.setProperty('--drift', (offset * 7).toFixed(1) + 'px');
+  names.style.setProperty('--tilt', tilt.toFixed(1) + 'deg');
 }
 function schedule() {
-  if (!scheduled && visible && !quiet()) {
+  if (!scheduled && visible && !quiet() && desktopPointer.matches) {
     scheduled = true;
     requestAnimationFrame(move);
   }
 }
 addEventListener('scroll', schedule, { passive: true });
-function tilt(degrees) {
-  if (!quiet() && visible) names.style.setProperty('--tilt', Math.max(-5, Math.min(5, degrees)) + 'deg');
-}
-hero.addEventListener('pointermove', e => tilt((e.clientX / innerWidth - .5) * 10), { passive: true });
-hero.addEventListener('pointerleave', () => tilt(0));
-addEventListener('deviceorientation', e => { if (e.gamma != null) tilt(e.gamma / 6); }, { passive: true });
+hero.addEventListener('pointermove', event => {
+  if (event.pointerType !== 'mouse') return;
+  tilt = Math.max(-3, Math.min(3, (event.clientX / innerWidth - .5) * 6));
+  schedule();
+}, { passive: true });
+hero.addEventListener('pointerleave', () => {
+  tilt = 0;
+  schedule();
+});
+desktopPointer.addEventListener('change', () => {
+  if (desktopPointer.matches) schedule();
+  else {
+    hero.style.removeProperty('--drift');
+    names.style.removeProperty('--tilt');
+  }
+});
 const observer = new IntersectionObserver(entries => {
   for (const entry of entries) {
     if (entry.target === hero) { visible = entry.isIntersecting; schedule(); continue; }
@@ -59,3 +72,11 @@ document.addEventListener('click', e => {
   if (e.target.closest('a,button') && !e.target.closest('#sound-toggle,#open-invitation,#reveal-date')) cue('tap');
 });
 document.querySelector('#reveal-date').addEventListener('pointerdown', () => cue('tick'));
+
+// Suspend decorative animation when its section is outside the viewport.
+const dustObserver = new IntersectionObserver(entries => {
+  for (const entry of entries) {
+    entry.target.classList.toggle('dust-visible', entry.isIntersecting);
+  }
+});
+for (const element of [document.querySelector('.film'), hero, footer]) dustObserver.observe(element);
